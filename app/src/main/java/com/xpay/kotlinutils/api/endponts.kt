@@ -1,10 +1,9 @@
 package com.xpay.kotlinutils.api
 
 
-import com.xpay.kotlinutils.model.PrepareResponse
-import com.xpay.kotlinutils.model.Transaction
-import com.xpay.kotlinutils.model.prepareRes
-import model.PopularMovies
+import com.xpay.kotlin.models.PayResponse
+import com.xpay.kotlin.models.PrepareAmount
+import com.xpay.kotlin.models.Transaction
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
@@ -51,7 +50,7 @@ interface Xpay {
     ): Call<ResponseBody>
 
     @POST("/api/v1/payments/prepare-amount/")
-    fun prepareAmount(@Body category: HashMap<String, Any>, @Header("x-api-key") authToken: String): Call<PrepareResponse>
+    fun prepareAmount(@Body category: HashMap<String, Any>, @Header("x-api-key") authToken: String): Call<PrepareAmount>
 
     @GET("/api/v1/communities/{community_id}/transactions/{transaction_uuid}/")
     fun getTransaction(
@@ -61,5 +60,5 @@ interface Xpay {
     ): Call<Transaction>
 
     @POST("/api/v1/payments/pay/variable-amount")
-    fun payBill(@Header("x-api-key") authToken: String,@Body body: HashMap<String, Any>): Call<ResponseBody>
+    fun payBill(@Header("x-api-key") authToken: String,@Body category: HashMap<String, Any>): Call<PayResponse>
 }
