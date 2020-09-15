@@ -14,6 +14,7 @@ object XpayUtils {
 
     var apiKey: String? = null
     var variableAmountID: Number? = null
+	var iframeUrl: String? = null
     var communityId: String? = null
     var payUsing: String? = "card"
     var amount: Number? = null
