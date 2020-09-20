@@ -14,10 +14,9 @@ object XpayUtils {
 
     var apiKey: String? = null
     var variableAmountID: Number? = null
-	var iframeUrl: String? = null
+    var iframeUrl: String? = null
     var communityId: String? = null
     var payUsing: String? = "card"
-    var amount: Number? = null
     var currency: String? = "EGP"
     var user: User? = null
 
@@ -27,20 +26,23 @@ object XpayUtils {
 
 
     fun prepareAmount(
+        token: String,
         amount: Number,
         communityID: String,
         onSuccess: (PrepareAmount) -> Unit,
         onFail: (String) -> Unit
     ) {
         val hashMap: HashMap<String, Any> = HashMap<String, Any>()
-        hashMap.put("amount", amount)
-        hashMap.put("community_id", communityID)
+        hashMap["amount"] = amount
+        hashMap["community_id"] = communityID
         val request = ServiceBuilder.xpayService(Xpay::class.java)
-        val call = request.prepareAmount(hashMap, "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss")
+        val call = request.prepareAmount(hashMap, token)
         call.enqueue(object : Callback<PrepareAmount> {
             override fun onResponse(call: Call<PrepareAmount>, response: Response<PrepareAmount>) {
-                if (response.body() != null && response.isSuccessful) {
+                if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
+                } else {
+                    response.body()?.status?.message?.let { onFail(it) }
                 }
             }
 
@@ -61,8 +63,10 @@ object XpayUtils {
         val call = request.getTransaction(token, communityID, transactionUid)
         call.enqueue(object : Callback<Transaction> {
             override fun onResponse(call: Call<Transaction>, response: Response<Transaction>) {
-                if (response.body() != null && response.isSuccessful) {
+                if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
+                } else {
+                    response.body()?.status?.message?.let { onFail(it) }
                 }
             }
 
@@ -72,32 +76,34 @@ object XpayUtils {
         })
     }
 
-    fun payBill(
-        maount: Number,
+    fun pay(
+        amount: Number,
         token: String,
         onSuccess: (PayResponse) -> Unit,
         onFail: (String) -> Unit
     ) {
-        val user:User= XpayUtils.user!!
+        val user: User = user!!
         val billingData: HashMap<String, Any> = HashMap<String, Any>()
         val requestBody: HashMap<String, Any> = HashMap<String, Any>()
 
-        billingData.put("name", user.name)
-        billingData.put("email", user.email)
-        billingData.put("phone_number", user.phone)
-        amount?.let { requestBody.put("amount", it) }
-        XpayUtils.currency?.let { requestBody.put("currency", it) }
-        XpayUtils.variableAmountID?.let { requestBody.put("variable_amount_id", it) }
-        XpayUtils.communityId?.let { requestBody.put("community_id", it) }
-        XpayUtils.payUsing?.let { requestBody.put("pay_using", it) }
-        requestBody.put("billing_data", billingData)
+        billingData["name"] = user.name
+        billingData["email"] = user.email
+        billingData["phone_number"] = user.phone
+        requestBody["amount"] = amount
+        currency?.let { requestBody.put("currency", it) }
+        variableAmountID?.let { requestBody.put("variable_amount_id", it) }
+        communityId?.let { requestBody.put("community_id", it) }
+        payUsing?.let { requestBody.put("pay_using", it) }
+        requestBody["billing_data"] = billingData
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
-        val call = request.payBill(token, requestBody)
+        val call = request.pay(token, requestBody)
         call.enqueue(object : Callback<PayResponse> {
             override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
-                if (response.body() != null && response.isSuccessful) {
+                if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
+                } else {
+                    response.body()?.status?.message?.let { onFail(it) }
                 }
             }
 

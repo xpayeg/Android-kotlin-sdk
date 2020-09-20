@@ -60,5 +60,5 @@ interface Xpay {
     ): Call<Transaction>
 
     @POST("/api/v1/payments/pay/variable-amount")
-    fun payBill(@Header("x-api-key") authToken: String,@Body category: HashMap<String, Any>): Call<PayResponse>
+    fun pay(@Header("x-api-key") authToken: String,@Body category: HashMap<String, Any>): Call<PayResponse>
 }
