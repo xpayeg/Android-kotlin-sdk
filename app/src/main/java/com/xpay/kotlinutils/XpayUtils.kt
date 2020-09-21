@@ -18,11 +18,13 @@ object XpayUtils {
     var totalAmount: TotalAmount? = null
         private set
     var communityId: String? = null
-    var payUsing: Array<String>  = arrayOf()
+    var payUsing: String? = null
         private set
     var currency: String? = "EGP"
         private set
     var user: User? = null
+    var amount: Number? = null
+        private set
 
     fun welcomeMessage(context: Context) {
         Toast.makeText(context, "Welcome To Xpay Sdk", Toast.LENGTH_LONG).show()
@@ -47,10 +49,14 @@ object XpayUtils {
                     if (response.body() != null && response.isSuccessful && response.code() != 404) {
                         onSuccess(response.body()!!)
 
-                        if(response.body()!!.data != null){
-                            val res=response.body()!!.data
-                            totalAmount = TotalAmount(res.total_amount, res.cASH.total_amount, res.kIOSK.total_amount)
-                            payUsing[0] = "CARD"
+                        if (response.body()!!.data != null) {
+                            val res = response.body()!!.data
+                            totalAmount = TotalAmount(
+                                res.total_amount,
+                                res.cASH.total_amount,
+                                res.kIOSK.total_amount
+                            )
+                            payUsing = "CARD"
                         }
 
                     } else {
@@ -89,28 +95,34 @@ object XpayUtils {
     }
 
     fun pay(
-        amount: Number,
-        token: String,
         onSuccess: (PayResponse) -> Unit,
         onFail: (String) -> Unit
     ) {
         val user: User = user!!
-        val billingData: HashMap<String, Any> = HashMap<String, Any>()
-        val requestBody: HashMap<String, Any> = HashMap<String, Any>()
-
+        val billingData: HashMap<String, Any> = HashMap()
+        val requestBody: HashMap<String, Any> = HashMap()
+        
+        when (payUsing) {
+            "CARD" -> totalAmount?.card
+            "CASH" -> totalAmount?.cash
+            "KIOSK" -> totalAmount?.kiosk
+        }
         billingData["name"] = user.name
         billingData["email"] = user.email
         billingData["phone_number"] = user.phone
-        requestBody["amount"] = amount
+        requestBody["amount"] = amount!!
         currency?.let { requestBody.put("currency", it) }
         variableAmountID?.let { requestBody.put("variable_amount_id", it) }
         communityId?.let { requestBody.put("community_id", it) }
-        payUsing?.let { requestBody.put("pay_using", it) }
+        payUsing.let {
+            if (it != null) {
+                requestBody["pay_using"] = it
+            }
+        }
         requestBody["billing_data"] = billingData
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
-        val call = request.pay(token, requestBody)
-        call.enqueue(object : Callback<PayResponse> {
+        apiKey?.let { request.pay(it, requestBody) }?.enqueue(object : Callback<PayResponse> {
             override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
                 if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
