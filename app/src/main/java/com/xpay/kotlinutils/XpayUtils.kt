@@ -6,6 +6,8 @@ import api.ServiceBuilder
 import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
 import com.xpay.kotlinutils.model.TotalAmount
+import com.xpay.kotlinutils.model.CustomField
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -23,6 +25,8 @@ object XpayUtils {
     var currency: String? = "EGP"
         private set
     var user: User? = null
+    var customFields = mutableListOf<CustomField>()
+    private set
 
     fun welcomeMessage(context: Context) {
         Toast.makeText(context, "Welcome To Xpay Sdk", Toast.LENGTH_LONG).show()
@@ -107,6 +111,7 @@ object XpayUtils {
         communityId?.let { requestBody.put("community_id", it) }
         payUsing?.let { requestBody.put("pay_using", it) }
         requestBody["billing_data"] = billingData
+        requestBody["custom_fields"] = customFields
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
         val call = request.pay(token, requestBody)
@@ -125,5 +130,12 @@ object XpayUtils {
         })
     }
 
+    fun addCustomField(fieldName: String, fieldValue: String) {
+        customFields.add(CustomField(fieldName, fieldValue))
+    }
+
+    fun clearCustomField() {
+        customFields.clear()
+    }
 
 }
