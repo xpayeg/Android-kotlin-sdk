@@ -98,6 +98,7 @@ object XpayUtils {
         communityId?.let { requestBody.put("community_id", it) }
         payUsing?.let { requestBody.put("pay_using", it) }
         requestBody["billing_data"] = billingData
+        requestBody["custom_fields"] = customFields
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
         val call = request.pay(token, requestBody)
