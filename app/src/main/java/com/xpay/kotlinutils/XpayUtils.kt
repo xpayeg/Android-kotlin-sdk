@@ -6,19 +6,22 @@ import api.ServiceBuilder
 import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
 import com.xpay.kotlinutils.model.TotalAmount
+import com.xpay.kotlinutils.model.CustomField
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 object XpayUtils {
 
-    var apiKey: String? = null
+  var apiKey: String? = null
     var variableAmountID: Number? = null
     var iframeUrl: String? = null
     var totalAmount: TotalAmount? = null
         private set
     var communityId: String? = null
     var payUsing: String? = null
+    var paymentOptions: ArrayList<String> = ArrayList()
         private set
     var currency: String? = "EGP"
         private set
@@ -51,6 +54,15 @@ object XpayUtils {
 
                         if (response.body()!!.data != null) {
                             val res = response.body()!!.data
+                            if(res.total_amount!=null){
+                                paymentOptions.add("CARD")
+                            }
+                            if(res.cASH!=null){
+                                paymentOptions.add("CASH")
+                            }
+                            if(res.kIOSK!=null){
+                                paymentOptions.add("KIOSK")
+                            }
                             totalAmount = TotalAmount(
                                 res.total_amount,
                                 res.cASH.total_amount,
@@ -94,6 +106,7 @@ object XpayUtils {
         })
     }
 
+   
     fun pay(
         onSuccess: (PayResponse) -> Unit,
         onFail: (String) -> Unit
@@ -136,6 +149,5 @@ object XpayUtils {
             }
         })
     }
-
 
 }
