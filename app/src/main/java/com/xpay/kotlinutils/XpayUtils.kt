@@ -19,6 +19,7 @@ object XpayUtils {
         private set
     var communityId: String? = null
     var payUsing: String? = null
+    var paymentOptions: ArrayList<String> = ArrayList()
         private set
     var currency: String? = "EGP"
         private set
@@ -51,6 +52,15 @@ object XpayUtils {
 
                         if (response.body()!!.data != null) {
                             val res = response.body()!!.data
+                            if(res.total_amount!=null){
+                                paymentOptions.add("CARD")
+                            }
+                            if(res.cASH!=null){
+                                paymentOptions.add("CASH")
+                            }
+                            if(res.kIOSK!=null){
+                                paymentOptions.add("KIOSK")
+                            }
                             totalAmount = TotalAmount(
                                 res.total_amount,
                                 res.cASH.total_amount,
