@@ -17,9 +17,15 @@ object XpayUtils {
     var variableAmountID: Number? = null
     var iframeUrl: String? = null
     var communityId: String? = null
+    var payUsing: String? = null
+    var paymentOptions: ArrayList<String> = ArrayList()
+        private set
+
     var payUsing: String? = "card"
     var currency: String? = "EGP"
     var user: User? = null
+    var amount: Number? = null
+        private set
     var customFields = mutableListOf<CustomField>()
     private set
 
@@ -39,6 +45,38 @@ object XpayUtils {
         hashMap["amount"] = amount
         hashMap["community_id"] = communityID
         val request = ServiceBuilder.xpayService(Xpay::class.java)
+        apiKey?.let { request.prepareAmount(hashMap, it) }
+            ?.enqueue(object : Callback<PrepareAmount> {
+                override fun onResponse(
+                    call: Call<PrepareAmount>,
+                    response: Response<PrepareAmount>
+                ) {
+                    if (response.body() != null && response.isSuccessful && response.code() != 404) {
+                        onSuccess(response.body()!!)
+
+                        if (response.body()!!.data != null) {
+                            val res = response.body()!!.data
+                            if(res.total_amount!=null){
+                                paymentOptions.add("CARD")
+                            }
+                            if(res.cASH!=null){
+                                paymentOptions.add("CASH")
+                            }
+                            if(res.kIOSK!=null){
+                                paymentOptions.add("KIOSK")
+                            }
+                            totalAmount = TotalAmount(
+                                res.total_amount,
+                                res.cASH.total_amount,
+                                res.kIOSK.total_amount
+                            )
+                            payUsing = "CARD"
+                        }
+
+                    } else {
+                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
+                    }
+=======
         val call = request.prepareAmount(hashMap, token)
         call.enqueue(object : Callback<PrepareAmount> {
             override fun onResponse(call: Call<PrepareAmount>, response: Response<PrepareAmount>) {
@@ -80,29 +118,35 @@ object XpayUtils {
     }
 
     fun pay(
-        amount: Number,
-        token: String,
         onSuccess: (PayResponse) -> Unit,
         onFail: (String) -> Unit
     ) {
         val user: User = user!!
-        val billingData: HashMap<String, Any> = HashMap<String, Any>()
-        val requestBody: HashMap<String, Any> = HashMap<String, Any>()
-
+        val billingData: HashMap<String, Any> = HashMap()
+        val requestBody: HashMap<String, Any> = HashMap()
+        
+        when (payUsing) {
+            "CARD" -> totalAmount?.card
+            "CASH" -> totalAmount?.cash
+            "KIOSK" -> totalAmount?.kiosk
+        }
         billingData["name"] = user.name
         billingData["email"] = user.email
         billingData["phone_number"] = user.phone
-        requestBody["amount"] = amount
+        requestBody["amount"] = amount!!
         currency?.let { requestBody.put("currency", it) }
         variableAmountID?.let { requestBody.put("variable_amount_id", it) }
         communityId?.let { requestBody.put("community_id", it) }
-        payUsing?.let { requestBody.put("pay_using", it) }
+        payUsing.let {
+            if (it != null) {
+                requestBody["pay_using"] = it
+            }
+        }
         requestBody["billing_data"] = billingData
         requestBody["custom_fields"] = customFields
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
-        val call = request.pay(token, requestBody)
-        call.enqueue(object : Callback<PayResponse> {
+        apiKey?.let { request.pay(it, requestBody) }?.enqueue(object : Callback<PayResponse> {
             override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
                 if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
