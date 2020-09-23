@@ -9,8 +9,6 @@ import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
 import com.xpay.kotlinutils.model.TotalAmount
 import com.xpay.kotlinutils.model.CustomField
-import okhttp3.ResponseBody
-import org.json.JSONArray
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
