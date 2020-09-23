@@ -5,8 +5,7 @@ import android.widget.Toast
 import api.ServiceBuilder
 import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
-import com.xpay.kotlinutils.model.CustomField
-import okhttp3.ResponseBody
+import com.xpay.kotlinutils.model.TotalAmount
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,18 +15,17 @@ object XpayUtils {
     var apiKey: String? = null
     var variableAmountID: Number? = null
     var iframeUrl: String? = null
+    var totalAmount: TotalAmount? = null
+        private set
     var communityId: String? = null
     var payUsing: String? = null
     var paymentOptions: ArrayList<String> = ArrayList()
         private set
-
-    var payUsing: String? = "card"
     var currency: String? = "EGP"
+        private set
     var user: User? = null
     var amount: Number? = null
         private set
-    var customFields = mutableListOf<CustomField>()
-    private set
 
     fun welcomeMessage(context: Context) {
         Toast.makeText(context, "Welcome To Xpay Sdk", Toast.LENGTH_LONG).show()
@@ -35,15 +33,13 @@ object XpayUtils {
 
 
     fun prepareAmount(
-        token: String,
         amount: Number,
-        communityID: String,
         onSuccess: (PrepareAmount) -> Unit,
         onFail: (String) -> Unit
     ) {
         val hashMap: HashMap<String, Any> = HashMap<String, Any>()
         hashMap["amount"] = amount
-        hashMap["community_id"] = communityID
+        hashMap["community_id"] = communityId.toString()
         val request = ServiceBuilder.xpayService(Xpay::class.java)
         apiKey?.let { request.prepareAmount(hashMap, it) }
             ?.enqueue(object : Callback<PrepareAmount> {
@@ -76,21 +72,12 @@ object XpayUtils {
                     } else {
                         response.body()?.status?.errors?.get(0)?.let { onFail(it) }
                     }
-=======
-        val call = request.prepareAmount(hashMap, token)
-        call.enqueue(object : Callback<PrepareAmount> {
-            override fun onResponse(call: Call<PrepareAmount>, response: Response<PrepareAmount>) {
-                if (response.body() != null && response.isSuccessful && response.code() != 404) {
-                    onSuccess(response.body()!!)
-                } else {
-                    response.body()?.status?.message?.let { onFail(it) }
                 }
-            }
 
-            override fun onFailure(call: Call<PrepareAmount>, t: Throwable) {
-                onFail(t.message.toString())
-            }
-        })
+                override fun onFailure(call: Call<PrepareAmount>, t: Throwable) {
+                    onFail(t.message.toString())
+                }
+            })
     }
 
     fun getTransaction(
@@ -124,7 +111,7 @@ object XpayUtils {
         val user: User = user!!
         val billingData: HashMap<String, Any> = HashMap()
         val requestBody: HashMap<String, Any> = HashMap()
-        
+
         when (payUsing) {
             "CARD" -> totalAmount?.card
             "CASH" -> totalAmount?.cash
@@ -143,7 +130,6 @@ object XpayUtils {
             }
         }
         requestBody["billing_data"] = billingData
-        requestBody["custom_fields"] = customFields
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
         apiKey?.let { request.pay(it, requestBody) }?.enqueue(object : Callback<PayResponse> {
@@ -161,12 +147,5 @@ object XpayUtils {
         })
     }
 
-    fun addCustomField(fieldName: String, fieldValue: String) {
-        customFields.add(CustomField(fieldName, fieldValue))
-    }
-
-    fun clearCustomField() {
-        customFields.clear()
-    }
 
 }
