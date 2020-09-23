@@ -29,7 +29,7 @@ object XpayUtils {
         private set
     var user: User? = null
     var amount: Number? = null
-        private set
+//        private set
 
     fun welcomeMessage(context: Context) {
         Toast.makeText(context, "Welcome To Xpay Sdk", Toast.LENGTH_LONG).show()
