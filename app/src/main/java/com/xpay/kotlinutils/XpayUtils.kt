@@ -3,11 +3,14 @@ package com.xpay.kotlinutils
 import android.content.Context
 import android.widget.Toast
 import api.ServiceBuilder
+import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
 import com.xpay.kotlinutils.model.TotalAmount
 import com.xpay.kotlinutils.model.CustomField
 import okhttp3.ResponseBody
+import org.json.JSONArray
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -133,8 +136,7 @@ object XpayUtils {
             }
         }
         if(customFields.size>0){
-            val map = customFields.associateBy({it.field_name}, {it.field_value})
-            requestBody.putAll(map)
+            requestBody["custom_fields"]= Gson().toJson(customFields)
         }
 
         requestBody["billing_data"] = billingData
