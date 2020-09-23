@@ -10,6 +10,9 @@ import com.xpay.kotlinutils.model.TotalAmount
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 object XpayUtils {
 
@@ -128,7 +131,7 @@ object XpayUtils {
         variableAmountID?.let { requestBody.put("variable_amount_id", it) }
         communityId?.let { requestBody.put("community_id", it) }
         payUsing.let {
-            if (it != null) {
+            if (it != null && it.toUpperCase(Locale.ROOT) in paymentOptions) {
                 requestBody["pay_using"] = it
             }
         }
