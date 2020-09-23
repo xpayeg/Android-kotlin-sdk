@@ -57,7 +57,7 @@ object XpayUtils {
                             if(res.total_amount!=null){
                                 paymentOptions.add("CARD")
                             }
-                            if(res.cASH!=null){
+                            if(res.CASH!=null){
                                 paymentOptions.add("CASH")
                             }
                             if(res.kIOSK!=null){
@@ -65,7 +65,7 @@ object XpayUtils {
                             }
                             totalAmount = TotalAmount(
                                 res.total_amount,
-                                res.cASH.total_amount,
+                                res.CASH.total_amount,
                                 res.kIOSK.total_amount
                             )
                             payUsing = "CARD"
