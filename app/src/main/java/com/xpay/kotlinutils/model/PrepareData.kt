@@ -6,5 +6,5 @@ data class PrepareData (
     @SerializedName("total_amount") val total_amount : Double,
     @SerializedName("total_amount_currency") val total_amount_currency : String,
     @SerializedName("CASH") val CASH : CASH,
-    @SerializedName("KIOSK") val kIOSK : KIOSK
+    @SerializedName("KIOSK") val KIOSK : KIOSK
 )

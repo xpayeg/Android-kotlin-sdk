@@ -62,15 +62,15 @@ object XpayUtils {
                             if(res.CASH!=null){
                                 paymentOptions.add("CASH")
                             }
-                            if(res.kIOSK!=null){
+                            if(res.KIOSK!=null){
                                 paymentOptions.add("KIOSK")
                             }
                             totalAmount = TotalAmount(
                                 res.total_amount,
                                 res.CASH.total_amount,
-                                res.kIOSK.total_amount
+                                res.KIOSK.total_amount
                             )
-                            payUsing = "CARD"
+
                         }
 
                     } else {
@@ -116,12 +116,7 @@ object XpayUtils {
         val user: User = user!!
         val billingData: HashMap<String, Any> = HashMap()
         val requestBody: HashMap<String, Any> = HashMap()
-        
-        when (payUsing) {
-            "CARD" -> totalAmount?.card
-            "CASH" -> totalAmount?.cash
-            "KIOSK" -> totalAmount?.kiosk
-        }
+
         billingData["name"] = user.name
         billingData["email"] = user.email
         billingData["phone_number"] = user.phone
@@ -134,6 +129,11 @@ object XpayUtils {
                 requestBody["pay_using"] = it
             }
         }
+        if(customFields.size>0){
+            val map = customFields.associateBy({it.field_name}, {it.field_value})
+            requestBody.putAll(map)
+        }
+
         requestBody["billing_data"] = billingData
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
