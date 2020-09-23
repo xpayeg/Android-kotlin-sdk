@@ -25,6 +25,7 @@ object XpayUtils {
         private set
     var currency: String? = "EGP"
         private set
+    var customFields = mutableListOf<CustomField>()
     var user: User? = null
     var amount: Number? = null
         private set
@@ -149,5 +150,14 @@ object XpayUtils {
             }
         })
     }
+
+    fun addCustomField(fieldName: String, fieldValue: String) {
+        customFields.add(CustomField(fieldName, fieldValue))
+    }
+
+    fun clearCustomField() {
+        customFields.clear()
+    }
+
 
 }
