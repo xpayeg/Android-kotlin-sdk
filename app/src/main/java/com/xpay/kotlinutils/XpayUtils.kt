@@ -3,10 +3,12 @@ package com.xpay.kotlinutils
 import android.content.Context
 import android.widget.Toast
 import api.ServiceBuilder
+import com.google.gson.JsonArray
 import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
 import com.xpay.kotlinutils.model.CustomField
 import com.xpay.kotlinutils.model.TotalAmount
+import org.json.JSONArray
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -134,6 +136,10 @@ object XpayUtils {
             if (it != null && it.toUpperCase(Locale.ROOT) in paymentOptions) {
                 requestBody["pay_using"] = it
             }
+        }
+        if(customFields.size>0){
+            val jsonArray:JSONArray = JSONArray(customFields)
+            requestBody["custom_fields"]= jsonArray
         }
         requestBody["billing_data"] = billingData
 
