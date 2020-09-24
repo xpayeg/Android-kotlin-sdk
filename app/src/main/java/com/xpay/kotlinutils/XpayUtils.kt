@@ -119,6 +119,7 @@ object XpayUtils {
         val user: User = user!!
         val billingData: HashMap<String, Any> = HashMap()
         val requestBody: HashMap<String, Any> = HashMap()
+        val customBody:  List<CustomField>
 
         when (payUsing) {
             "CARD" -> totalAmount?.card
@@ -138,8 +139,8 @@ object XpayUtils {
             }
         }
         if(customFields.size>0){
-            val jsonArray:JSONArray = JSONArray(customFields)
-            requestBody["custom_fields"]= jsonArray
+            customBody= customFields
+            requestBody["custom_fields"]= customBody
         }
         requestBody["billing_data"] = billingData
 
