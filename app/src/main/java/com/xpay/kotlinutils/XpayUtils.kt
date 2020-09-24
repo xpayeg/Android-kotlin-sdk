@@ -120,6 +120,7 @@ object XpayUtils {
         val user: User = user!!
         val billingData: HashMap<String, Any> = HashMap()
         val requestBody: HashMap<String, Any> = HashMap()
+        val customBody:  List<CustomField>
 
         billingData["name"] = user.name
         billingData["email"] = user.email
@@ -134,7 +135,8 @@ object XpayUtils {
             }
         }
         if(customFields.size>0){
-            requestBody["custom_fields"]= Gson().toJson(customFields)
+            customBody= customFields
+            requestBody["custom_fields"]= customBody
         }
 
         requestBody["billing_data"] = billingData
