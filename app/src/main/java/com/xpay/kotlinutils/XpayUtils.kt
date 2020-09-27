@@ -9,6 +9,7 @@ import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
 import com.xpay.kotlinutils.model.TotalAmount
 import com.xpay.kotlinutils.model.CustomField
+import com.xpay.kotlinutils.model.Info
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,7 +19,7 @@ import kotlin.collections.HashMap
 
 object XpayUtils {
 
-  var apiKey: String? = null
+    var apiKey: String? = null
     var variableAmountID: Number? = null
     var iframeUrl: String? = null
     var totalAmount: TotalAmount? = null
@@ -32,6 +33,7 @@ object XpayUtils {
     var customFields = mutableListOf<CustomField>()
         private set
     var user: User? = null
+    var shippingInfo: Info? = null
     var amount: Number? = null
 //        private set
 
@@ -60,13 +62,13 @@ object XpayUtils {
 
                         if (response.body()!!.data != null) {
                             val res = response.body()!!.data
-                            if(res.total_amount!=null){
+                            if (res.total_amount != null) {
                                 paymentOptions.add("CARD")
                             }
-                            if(res.CASH!=null){
+                            if (res.CASH != null) {
                                 paymentOptions.add("CASH")
                             }
-                            if(res.KIOSK!=null){
+                            if (res.KIOSK != null) {
                                 paymentOptions.add("KIOSK")
                             }
                             totalAmount = TotalAmount(
@@ -112,7 +114,7 @@ object XpayUtils {
         })
     }
 
-   
+
     fun pay(
         onSuccess: (PayResponse) -> Unit,
         onFail: (String) -> Unit
@@ -120,7 +122,7 @@ object XpayUtils {
         val user: User = user!!
         val billingData: HashMap<String, Any> = HashMap()
         val requestBody: HashMap<String, Any> = HashMap()
-        val customBody:  List<CustomField>
+        val customBody: List<CustomField>
 
         billingData["name"] = user.name
         billingData["email"] = user.email
@@ -134,9 +136,21 @@ object XpayUtils {
                 requestBody["pay_using"] = it
             }
         }
-        if(customFields.size>0){
-            customBody= customFields
-            requestBody["custom_fields"]= customBody
+        if (customFields.size > 0) {
+            customBody = customFields
+            requestBody["custom_fields"] = customBody
+        }
+        if (payUsing == "cash") {
+            if (shippingInfo != null) {
+                billingData["country"] = "EG"
+                billingData["apartment"] = shippingInfo!!.apartment
+                billingData["city"] = shippingInfo!!.city
+                billingData["state"] = shippingInfo!!.state
+                billingData["country"] = shippingInfo!!.country
+                billingData["floor"] = shippingInfo!!.floor
+                billingData["street"] = shippingInfo!!.street
+                billingData["building"] = shippingInfo!!.building
+            }
         }
 
         requestBody["billing_data"] = billingData
