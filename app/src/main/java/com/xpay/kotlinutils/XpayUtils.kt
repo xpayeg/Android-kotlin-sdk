@@ -43,7 +43,7 @@ object XpayUtils {
 
     fun prepareAmount(
         amount: Number,
-        onSuccess: (PrepareAmount) -> Unit,
+        onSuccess: (PrepareData) -> Unit,
         onFail: (String) -> Unit
     ) {
         val hashMap: HashMap<String, Any> = HashMap()
@@ -58,26 +58,20 @@ object XpayUtils {
                     call: Call<PrepareAmount>,
                     response: Response<PrepareAmount>
                 ) {
-                    if (response.body() != null && response.isSuccessful && response.code() != 404) {
-                        onSuccess(response.body()!!)
+                    if (response.body() != null && response.isSuccessful) {
 
                         if (response.body()!!.data != null) {
-                            val res = response.body()!!.data
-                            if (res.total_amount != null) {
-                                paymentOptions.add("CARD")
-                            }
-                            if (res.CASH != null) {
-                                paymentOptions.add("CASH")
-                            }
-                            if (res.KIOSK != null) {
-                                paymentOptions.add("KIOSK")
-                            }
-                            totalAmount = TotalAmount(
-                                res.total_amount,
-                                res.CASH.total_amount,
-                                res.KIOSK.total_amount
-                            )
+                            val preparedData = response.body()!!.data
+                            onSuccess(preparedData)
+                            preparedData.total_amount?.let { paymentOptions.add("CARD") }
+                            preparedData.CASH?.let { paymentOptions.add("CASH") }
+                            preparedData.KIOSK?.let { paymentOptions.add("KIOSK") }
 
+                            totalAmount = TotalAmount(
+                                preparedData.total_amount,
+                                preparedData.CASH.total_amount,
+                                preparedData.KIOSK.total_amount
+                            )
                         }
 
                     } else {
