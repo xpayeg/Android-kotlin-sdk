@@ -23,25 +23,6 @@ interface Xpay {
         @Path("id") id: String
     ): Call<ResponseBody>
 
-    @GET("/api/users/{id}/cards")
-    fun loadCards(
-        @Header("Authorization") authToken: String,
-        @Path("id") id: String
-    ): Call<ResponseBody>
-
-    @GET("/api/users/otp/send/")
-    fun login(@Body category: Map<String, Any>): Call<ResponseBody>
-
-    @GET("/api/v1/users/{u_id}/transactions/{t_id}")
-    fun getTransactionState(
-        @Header("Authorization") authToken: String,
-        @Path("u_id") id: String,
-        @Path("t_id") tId: String
-    ): Call<ResponseBody>
-
-    @GET("/api/users/otp/verify/")
-    fun verifyOtp(@Body category: Map<String, Any>): Call<ResponseBody>
-
     @GET("/api/communities/{comm_id}/memberships/{member_id}/bills")
     fun userBills(
         @Header("Authorization") authToken: String,
