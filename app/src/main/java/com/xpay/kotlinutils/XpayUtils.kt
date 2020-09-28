@@ -2,14 +2,10 @@ package com.xpay.kotlinutils
 
 import android.content.Context
 import android.widget.Toast
-import api.ServiceBuilder
-import com.google.gson.Gson
-import com.google.gson.JsonArray
+import com.xpay.kotlinutils.api.ServiceBuilder
 import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
-import com.xpay.kotlinutils.model.TotalAmount
-import com.xpay.kotlinutils.model.CustomField
-import com.xpay.kotlinutils.model.Info
+import com.xpay.kotlinutils.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,10 +31,13 @@ object XpayUtils {
     var user: User? = null
     var shippingInfo: Info? = null
     var amount: Number? = null
-//        private set
+
+    private fun throwError(message: String): Nothing {
+        throw IllegalArgumentException(message)
+    }
 
     fun welcomeMessage(context: Context) {
-        Toast.makeText(context, "Welcome To Xpay Sdk", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Welcome To XPay Sdk", Toast.LENGTH_LONG).show()
     }
 
 
@@ -47,10 +46,12 @@ object XpayUtils {
         onSuccess: (PrepareAmount) -> Unit,
         onFail: (String) -> Unit
     ) {
-        val hashMap: HashMap<String, Any> = HashMap<String, Any>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["amount"] = amount
-        hashMap["community_id"] = communityId.toString()
+        hashMap["community_id"] = communityId ?: throwError("Community id is not found")
+
         val request = ServiceBuilder.xpayService(Xpay::class.java)
+
         apiKey?.let { request.prepareAmount(hashMap, it) }
             ?.enqueue(object : Callback<PrepareAmount> {
                 override fun onResponse(
@@ -87,7 +88,7 @@ object XpayUtils {
                 override fun onFailure(call: Call<PrepareAmount>, t: Throwable) {
                     onFail(t.message.toString())
                 }
-            })
+            }) ?: throwError("API key is not found")
     }
 
     fun getTransaction(
