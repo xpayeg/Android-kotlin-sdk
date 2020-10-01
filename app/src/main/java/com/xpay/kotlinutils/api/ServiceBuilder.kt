@@ -1,4 +1,4 @@
-package api
+package com.xpay.kotlinutils.api
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

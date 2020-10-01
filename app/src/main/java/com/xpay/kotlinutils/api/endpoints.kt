@@ -1,8 +1,8 @@
 package com.xpay.kotlinutils.api
 
 
-import com.xpay.kotlin.models.PayResponse
-import com.xpay.kotlin.models.PrepareAmount
+import com.xpay.kotlinutils.model.PayResponse
+import com.xpay.kotlinutils.model.PrepareAmount
 import com.xpay.kotlin.models.Transaction
 import okhttp3.ResponseBody
 import retrofit2.Call

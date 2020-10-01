@@ -1,6 +1,6 @@
 package com.xpay.kotlinutils.model
 
-class Info(
+data class Info(
     var country: String,
     var city: String,
     var state: String,
