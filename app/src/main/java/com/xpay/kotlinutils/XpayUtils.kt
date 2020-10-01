@@ -15,20 +15,21 @@ import kotlin.collections.HashMap
 
 object XpayUtils {
 
+    // API required settings
     var apiKey: String? = null
+    var communityId: String? = null
     var variableAmountID: Number? = null
+
     var iframeUrl: String? = null
     var totalAmount: TotalAmount? = null
         private set
-    var communityId: String? = null
     var payUsing: String? = null
     var paymentOptions: ArrayList<String> = ArrayList()
         private set
-    var currency: String? = "EGP"
-        private set
+    private val currency: String? = "EGP"
     var customFields = mutableListOf<CustomField>()
         private set
-    var user: User? = null
+    var userInfo: User? = null
     var shippingInfo: Info? = null
     var amount: Number? = null
 
@@ -111,50 +112,57 @@ object XpayUtils {
 
 
     fun pay(
-        onSuccess: (PayResponse) -> Unit,
+        onSuccess: (PayData) -> Unit,
         onFail: (String) -> Unit
     ) {
-        val user: User = user!!
-        val billingData: HashMap<String, Any> = HashMap()
-        val requestBody: HashMap<String, Any> = HashMap()
-        val customBody: List<CustomField>
+        // check for API settings
+        checkAPISettings()
 
-        billingData["name"] = user.name
-        billingData["email"] = user.email
-        billingData["phone_number"] = user.phone
-        requestBody["amount"] = amount!!
-        currency?.let { requestBody.put("currency", it) }
+        val requestBody: HashMap<String, Any> = HashMap()
         variableAmountID?.let { requestBody.put("variable_amount_id", it) }
         communityId?.let { requestBody.put("community_id", it) }
-        payUsing.let {
-            if (it != null && it.toUpperCase(Locale.ROOT) in paymentOptions) {
+
+        payUsing?.let {
+            if (it.toUpperCase(Locale.ROOT) in paymentOptions ?: throwError("payment options is not set")) {
                 requestBody["pay_using"] = it
             }
         }
+
+        val user: User = userInfo ?: throwError("User information is not set")
+        val billingData: HashMap<String, Any> = HashMap()
+        billingData["name"] = user.name
+        billingData["email"] = user.email
+        billingData["phone_number"] = user.phone
+
+        val customBody: List<CustomField>
         if (customFields.size > 0) {
             customBody = customFields
             requestBody["custom_fields"] = customBody
         }
+
+        requestBody["amount"] =
+            totalAmount ?: throwError("Total amount is not set, call prepareAmount method")
+        currency?.let { requestBody.put("currency", it) }
+
         if (payUsing == "cash") {
-            if (shippingInfo != null) {
+            shippingInfo?.let {
                 billingData["country"] = "EG"
-                billingData["apartment"] = shippingInfo!!.apartment
-                billingData["city"] = shippingInfo!!.city
-                billingData["state"] = shippingInfo!!.state
-                billingData["country"] = shippingInfo!!.country
-                billingData["floor"] = shippingInfo!!.floor
-                billingData["street"] = shippingInfo!!.street
-                billingData["building"] = shippingInfo!!.building
+                billingData["apartment"] = it.apartment
+                billingData["city"] = it.city
+                billingData["state"] = it.state
+                billingData["country"] = it.country
+                billingData["floor"] = it.floor
+                billingData["street"] = it.street
+                billingData["building"] = it.building
             }
         }
-
         requestBody["billing_data"] = billingData
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
         apiKey?.let { request.pay(it, requestBody) }?.enqueue(object : Callback<PayResponse> {
             override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
-                if (response.body() != null && response.isSuccessful && response.code() != 404) {
-                    onSuccess(response.body()!!)
+                if (response.body()?.data != null && response.isSuccessful) {
+                    onSuccess(response.body()!!.data)
                 } else {
                     response.body()?.status?.message?.let { onFail(it) }
                 }
@@ -174,5 +182,9 @@ object XpayUtils {
         customFields.clear()
     }
 
-
+    private fun checkAPISettings() {
+        apiKey ?: throwError("API key is not set")
+        communityId ?: throwError("Community ID is not set")
+        variableAmountID ?: throwError("API Payment ID is not set")
+    }
 }
