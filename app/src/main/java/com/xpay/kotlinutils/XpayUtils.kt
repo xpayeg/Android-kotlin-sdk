@@ -47,9 +47,11 @@ object XpayUtils {
         onSuccess: (PrepareData) -> Unit,
         onFail: (String) -> Unit
     ) {
+        checkAPISettings()
+
         val hashMap: HashMap<String, Any> = HashMap()
+        hashMap["community_id"] = communityId.toString()
         hashMap["amount"] = amount
-        hashMap["community_id"] = communityId ?: throwError("Community id is not found")
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
 
@@ -64,9 +66,9 @@ object XpayUtils {
                         if (response.body()!!.data != null) {
                             val preparedData = response.body()!!.data
                             onSuccess(preparedData)
-                            preparedData.total_amount?.let { paymentOptions.add("CARD") }
-                            preparedData.CASH?.let { paymentOptions.add("CASH") }
-                            preparedData.KIOSK?.let { paymentOptions.add("KIOSK") }
+                            preparedData.total_amount.let { paymentOptions.add("CARD") }
+                            preparedData.CASH.let { paymentOptions.add("CASH") }
+                            preparedData.KIOSK.let { paymentOptions.add("KIOSK") }
 
                             totalAmount = TotalAmount(
                                 preparedData.total_amount,
@@ -83,7 +85,7 @@ object XpayUtils {
                 override fun onFailure(call: Call<PrepareAmount>, t: Throwable) {
                     onFail(t.message.toString())
                 }
-            }) ?: throwError("API key is not found")
+            })
     }
 
     fun getTransaction(
