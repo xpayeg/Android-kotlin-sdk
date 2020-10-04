@@ -2,13 +2,10 @@ package com.xpay.kotlinutils
 
 import android.content.Context
 import android.widget.Toast
-import api.ServiceBuilder
-import com.google.gson.JsonArray
+import com.xpay.kotlinutils.api.ServiceBuilder
 import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
-import com.xpay.kotlinutils.model.CustomField
-import com.xpay.kotlinutils.model.TotalAmount
-import org.json.JSONArray
+import com.xpay.kotlinutils.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,63 +15,66 @@ import kotlin.collections.HashMap
 
 object XpayUtils {
 
+    // API required settings
     var apiKey: String? = null
+    var communityId: String? = null
     var variableAmountID: Number? = null
+
     var iframeUrl: String? = null
     var totalAmount: TotalAmount? = null
         private set
-    var communityId: String? = null
     var payUsing: String? = null
     var paymentOptions: ArrayList<String> = ArrayList()
         private set
-    var currency: String? = "EGP"
-        private set
+    private val currency: String? = "EGP"
     var customFields = mutableListOf<CustomField>()
         private set
-    var user: User? = null
+    var userInfo: User? = null
+    var shippingInfo: Info? = null
     var amount: Number? = null
-//        private set
+
+    private fun throwError(message: String): Nothing {
+        throw IllegalArgumentException(message)
+    }
 
     fun welcomeMessage(context: Context) {
-        Toast.makeText(context, "Welcome To Xpay Sdk", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Welcome To XPay Sdk", Toast.LENGTH_LONG).show()
     }
 
 
     fun prepareAmount(
         amount: Number,
-        onSuccess: (PrepareAmount) -> Unit,
+        onSuccess: (PrepareData) -> Unit,
         onFail: (String) -> Unit
     ) {
-        val hashMap: HashMap<String, Any> = HashMap<String, Any>()
-        hashMap["amount"] = amount
+        checkAPISettings()
+
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["community_id"] = communityId.toString()
+        hashMap["amount"] = amount
+
         val request = ServiceBuilder.xpayService(Xpay::class.java)
+
         apiKey?.let { request.prepareAmount(hashMap, it) }
             ?.enqueue(object : Callback<PrepareAmount> {
                 override fun onResponse(
                     call: Call<PrepareAmount>,
                     response: Response<PrepareAmount>
                 ) {
-                    if (response.body() != null && response.isSuccessful && response.code() != 404) {
-                        onSuccess(response.body()!!)
+                    if (response.body() != null && response.isSuccessful) {
 
                         if (response.body()!!.data != null) {
-                            val res = response.body()!!.data
-                            if(res.total_amount!=null){
-                                paymentOptions.add("CARD")
-                            }
-                            if(res.CASH!=null){
-                                paymentOptions.add("CASH")
-                            }
-                            if(res.kIOSK!=null){
-                                paymentOptions.add("KIOSK")
-                            }
+                            val preparedData = response.body()!!.data
+                            onSuccess(preparedData)
+                            preparedData.total_amount.let { paymentOptions.add("CARD") }
+                            preparedData.CASH.let { paymentOptions.add("CASH") }
+                            preparedData.KIOSK.let { paymentOptions.add("KIOSK") }
+
                             totalAmount = TotalAmount(
-                                res.total_amount,
-                                res.CASH.total_amount,
-                                res.kIOSK.total_amount
+                                preparedData.total_amount,
+                                preparedData.CASH.total_amount,
+                                preparedData.KIOSK.total_amount
                             )
-                            payUsing = "CARD"
                         }
 
                     } else {
@@ -112,43 +112,59 @@ object XpayUtils {
         })
     }
 
+
     fun pay(
-        onSuccess: (PayResponse) -> Unit,
+        onSuccess: (PayData) -> Unit,
         onFail: (String) -> Unit
     ) {
-        val user: User = user!!
-        val billingData: HashMap<String, Any> = HashMap()
-        val requestBody: HashMap<String, Any> = HashMap()
-        val customBody:  List<CustomField>
+        // check for API settings
+        checkAPISettings()
 
-        when (payUsing) {
-            "CARD" -> totalAmount?.card
-            "CASH" -> totalAmount?.cash
-            "KIOSK" -> totalAmount?.kiosk
-        }
-        billingData["name"] = user.name
-        billingData["email"] = user.email
-        billingData["phone_number"] = user.phone
-        requestBody["amount"] = amount!!
-        currency?.let { requestBody.put("currency", it) }
+        val requestBody: HashMap<String, Any> = HashMap()
         variableAmountID?.let { requestBody.put("variable_amount_id", it) }
         communityId?.let { requestBody.put("community_id", it) }
-        payUsing.let {
-            if (it != null && it.toUpperCase(Locale.ROOT) in paymentOptions) {
+
+        payUsing?.let {
+            if (it.toUpperCase(Locale.ROOT) in paymentOptions ?: throwError("payment options is not set")) {
                 requestBody["pay_using"] = it
             }
         }
-        if(customFields.size>0){
-            customBody= customFields
-            requestBody["custom_fields"]= customBody
+
+        val user: User = userInfo ?: throwError("User information is not set")
+        val billingData: HashMap<String, Any> = HashMap()
+        billingData["name"] = user.name
+        billingData["email"] = user.email
+        billingData["phone_number"] = user.phone
+
+        val customBody: List<CustomField>
+        if (customFields.size > 0) {
+            customBody = customFields
+            requestBody["custom_fields"] = customBody
+        }
+
+        requestBody["amount"] =
+            totalAmount ?: throwError("Total amount is not set, call prepareAmount method")
+        currency?.let { requestBody.put("currency", it) }
+
+        if (payUsing == "cash") {
+            shippingInfo?.let {
+                billingData["country"] = "EG"
+                billingData["apartment"] = it.apartment
+                billingData["city"] = it.city
+                billingData["state"] = it.state
+                billingData["country"] = it.country
+                billingData["floor"] = it.floor
+                billingData["street"] = it.street
+                billingData["building"] = it.building
+            }
         }
         requestBody["billing_data"] = billingData
 
         val request = ServiceBuilder.xpayService(Xpay::class.java)
         apiKey?.let { request.pay(it, requestBody) }?.enqueue(object : Callback<PayResponse> {
             override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
-                if (response.body() != null && response.isSuccessful && response.code() != 404) {
-                    onSuccess(response.body()!!)
+                if (response.body()?.data != null && response.isSuccessful) {
+                    onSuccess(response.body()!!.data)
                 } else {
                     response.body()?.status?.message?.let { onFail(it) }
                 }
@@ -169,4 +185,9 @@ object XpayUtils {
         customFields.clear()
     }
 
+    private fun checkAPISettings() {
+        apiKey ?: throwError("API key is not set")
+        communityId ?: throwError("Community ID is not set")
+        variableAmountID ?: throwError("API Payment ID is not set")
+    }
 }

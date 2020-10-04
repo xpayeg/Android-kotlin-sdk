@@ -1,6 +1,8 @@
-package com.xpay.kotlin.models
+package com.xpay.kotlinutils.model
 
 import com.google.gson.annotations.SerializedName
+import com.xpay.kotlin.models.PrepareData
+import com.xpay.kotlin.models.Status
 
 
 data class PrepareAmount (
