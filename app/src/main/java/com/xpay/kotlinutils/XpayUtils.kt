@@ -1,11 +1,17 @@
-package com.xpay.kotlinutil
+package com.xpay.kotlinutils
 
 import android.content.Context
 import android.widget.Toast
 import com.xpay.kotlinutils.api.ServiceBuilder
-import com.xpay.kotlin.models.*
 import com.xpay.kotlinutils.api.Xpay
-import com.xpay.kotlinutils.model.*
+import com.xpay.kotlinutils.models.*
+import com.xpay.kotlinutils.models.api.pay.PayData
+import com.xpay.kotlinutils.models.api.pay.PayRequestBody
+import com.xpay.kotlinutils.models.api.pay.PayResponse
+import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
+import com.xpay.kotlinutils.models.api.prepare.PrepareRequestBody
+import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
+import com.xpay.kotlinutils.models.api.transaction.TransactionResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,7 +30,7 @@ object XpayUtils {
     var payUsing: PaymentMethods? = null
 
     // Pay request body
-    private var body: RequestBody? = null
+    private var bodyPay: PayRequestBody? = null
     var activePaymentMethods = mutableListOf<PaymentMethods>()
         private set
     private val currency: String? = "EGP"
@@ -33,7 +39,7 @@ object XpayUtils {
 
     // User data
     var userInfo: User? = null
-    var shippingInfo: Info? = null
+    var shippingShippingInfo: ShippingInfo? = null
 
 
     fun welcomeMessage(context: Context) {
@@ -44,12 +50,12 @@ object XpayUtils {
 
     fun prepareAmount(
         amount: Number,
-        onSuccess: (PreparedAmounts) -> Unit,
+        onSuccess: (PrepareAmountData) -> Unit,
         onFail: (String) -> Unit
     ) {
         checkAPISettings()
 
-        val body = PrepareBody(communityId.toString(), amount)
+        val body = PrepareRequestBody(communityId.toString(), amount)
         val request = ServiceBuilder.xpayService(Xpay::class.java)
         apiKey?.let { request.prepareAmount(body, it) }
             ?.enqueue(object : Callback<PrepareAmountResponse> {
@@ -91,19 +97,21 @@ object XpayUtils {
         // check for API settings
         checkAPISettings()
 
-        variableAmountID?.let { body= RequestBody(it) }
-        communityId?.let { body?.community_id = it }
+        val bodyPay = PayRequestBody()
+
+        variableAmountID?.let { bodyPay.variable_amount_id = it }
+        communityId?.let { bodyPay.community_id = it }
 
         // Payment method
         payUsing?.let {
             if (it in activePaymentMethods) {
-                body?.pay_using = it
+                bodyPay.pay_using = it
             }
 
             when (it) {
-                PaymentMethods.CARD -> body?.amount = PaymentOptionsTotalAmounts?.card!!
-                PaymentMethods.CASH -> body?.amount = PaymentOptionsTotalAmounts?.cash!!
-                PaymentMethods.KIOSK -> body?.amount = PaymentOptionsTotalAmounts?.kiosk!!
+                PaymentMethods.CARD -> bodyPay.amount = PaymentOptionsTotalAmounts?.card!!
+                PaymentMethods.CASH -> bodyPay.amount = PaymentOptionsTotalAmounts?.cash!!
+                PaymentMethods.KIOSK -> bodyPay.amount = PaymentOptionsTotalAmounts?.kiosk!!
             }
         } ?: throwError("Payment method is not set")
 
@@ -116,10 +124,10 @@ object XpayUtils {
 
         PaymentOptionsTotalAmounts
             ?: throwError("Total amount is not set, call prepareAmount method")
-        currency?.let { body?.currency=it }
+        currency?.let { bodyPay.currency =it }
 
         if (payUsing == PaymentMethods.CASH) {
-            shippingInfo?.let {
+            shippingShippingInfo?.let {
                 billingData["country"] = "EG"
                 billingData["apartment"] = it.apartment
                 billingData["city"] = it.city
@@ -130,17 +138,17 @@ object XpayUtils {
                 billingData["building"] = it.building
             }
         }
-        body?.billing_data = billingData
+        bodyPay.billing_data = billingData
 
         // custom fields
         val customBody: List<CustomField>
         if (customFields.size > 0) {
-            body?.custom_fields = customFields
+            bodyPay.custom_fields = customFields
         }
 
         // making a request
         val request = ServiceBuilder.xpayService(Xpay::class.java)
-        apiKey?.let { body?.let { it1 -> request.pay(it, it1) } }
+        apiKey?.let { bodyPay.let { it1 -> request.pay(it, it1) } }
             ?.enqueue(object : Callback<PayResponse> {
                 override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
                     if (response.body()?.data != null && response.isSuccessful) {
@@ -172,13 +180,13 @@ object XpayUtils {
         token: String,
         communityID: String,
         transactionUid: String,
-        onSuccess: (Transaction) -> Unit,
+        onSuccess: (TransactionResponse) -> Unit,
         onFail: (String) -> Unit
     ) {
         val request = ServiceBuilder.xpayService(Xpay::class.java)
         val call = request.getTransaction(token, communityID, transactionUid)
-        call.enqueue(object : Callback<Transaction> {
-            override fun onResponse(call: Call<Transaction>, response: Response<Transaction>) {
+        call.enqueue(object : Callback<TransactionResponse> {
+            override fun onResponse(call: Call<TransactionResponse>, response: Response<TransactionResponse>) {
                 if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
                 } else {
@@ -186,7 +194,7 @@ object XpayUtils {
                 }
             }
 
-            override fun onFailure(call: Call<Transaction>, t: Throwable) {
+            override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {
                 onFail(t.message.toString())
             }
         })

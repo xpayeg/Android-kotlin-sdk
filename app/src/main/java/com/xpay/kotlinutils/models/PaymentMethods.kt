@@ -1,4 +1,4 @@
-package com.xpay.kotlinutils.model
+package com.xpay.kotlinutils.models
 
 enum class PaymentMethods {
     CARD,
