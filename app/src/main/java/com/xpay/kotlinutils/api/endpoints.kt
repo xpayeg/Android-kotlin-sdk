@@ -3,7 +3,7 @@ package com.xpay.kotlinutils.api
 
 import com.xpay.kotlinutils.model.PayResponse
 import com.xpay.kotlinutils.model.PrepareAmountResponse
-import com.xpay.kotlin.models.Transaction
+import com.xpay.kotlinutils.model.Transaction
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
