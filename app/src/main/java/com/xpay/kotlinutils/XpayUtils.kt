@@ -1,4 +1,4 @@
-package com.xpay.kotlinutils
+package com.xpay.kotlinutil
 
 import android.content.Context
 import android.widget.Toast
@@ -17,15 +17,20 @@ object XpayUtils {
     var apiKey: String? = null
     var communityId: String? = null
     var variableAmountID: Number? = null
+
     // Payment methods data
     var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
         private set
     var payUsing: PaymentMethods? = null
+
+    // Pay request body
+    private var body: RequestBody? = null
     var activePaymentMethods = mutableListOf<PaymentMethods>()
         private set
     private val currency: String? = "EGP"
     var customFields = mutableListOf<CustomField>()
         private set
+
     // User data
     var userInfo: User? = null
     var shippingInfo: Info? = null
@@ -44,13 +49,9 @@ object XpayUtils {
     ) {
         checkAPISettings()
 
-        val hashMap: HashMap<String, Any> = HashMap()
-        hashMap["community_id"] = communityId.toString()
-        hashMap["amount"] = amount
-
+        val body = PrepareBody(communityId.toString(), amount)
         val request = ServiceBuilder.xpayService(Xpay::class.java)
-
-        apiKey?.let { request.prepareAmount(hashMap, it) }
+        apiKey?.let { request.prepareAmount(body, it) }
             ?.enqueue(object : Callback<PrepareAmountResponse> {
                 override fun onResponse(
                     call: Call<PrepareAmountResponse>,
@@ -90,23 +91,21 @@ object XpayUtils {
         // check for API settings
         checkAPISettings()
 
-        val requestBody: HashMap<String, Any?> = HashMap()
-        variableAmountID?.let { requestBody.put("variable_amount_id", it) }
-        communityId?.let { requestBody.put("community_id", it) }
+        variableAmountID?.let { body= RequestBody(it) }
+        communityId?.let { body?.community_id = it }
 
         // Payment method
         payUsing?.let {
             if (it in activePaymentMethods) {
-                requestBody["pay_using"] = it
+                body?.pay_using = it
             }
 
             when (it) {
-                PaymentMethods.CARD -> requestBody["amount"] = PaymentOptionsTotalAmounts?.card
-                PaymentMethods.CASH -> requestBody["amount"] = PaymentOptionsTotalAmounts?.cash
-                PaymentMethods.KIOSK -> requestBody["amount"] = PaymentOptionsTotalAmounts?.kiosk
+                PaymentMethods.CARD -> body?.amount = PaymentOptionsTotalAmounts?.card!!
+                PaymentMethods.CASH -> body?.amount = PaymentOptionsTotalAmounts?.cash!!
+                PaymentMethods.KIOSK -> body?.amount = PaymentOptionsTotalAmounts?.kiosk!!
             }
         } ?: throwError("Payment method is not set")
-
 
         // Billing information
         val user: User = userInfo ?: throwError("User information is not set")
@@ -117,7 +116,7 @@ object XpayUtils {
 
         PaymentOptionsTotalAmounts
             ?: throwError("Total amount is not set, call prepareAmount method")
-        currency?.let { requestBody.put("currency", it) }
+        currency?.let { body?.currency=it }
 
         if (payUsing == PaymentMethods.CASH) {
             shippingInfo?.let {
@@ -131,30 +130,30 @@ object XpayUtils {
                 billingData["building"] = it.building
             }
         }
-        requestBody["billing_data"] = billingData
+        body?.billing_data = billingData
 
         // custom fields
         val customBody: List<CustomField>
         if (customFields.size > 0) {
-            customBody = customFields
-            requestBody["custom_fields"] = customBody
+            body?.custom_fields = customFields
         }
 
         // making a request
         val request = ServiceBuilder.xpayService(Xpay::class.java)
-        apiKey?.let { request.pay(it, requestBody) }?.enqueue(object : Callback<PayResponse> {
-            override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
-                if (response.body()?.data != null && response.isSuccessful) {
-                    onSuccess(response.body()!!.data)
-                } else {
-                    response.body()?.status?.message?.let { onFail(it) }
+        apiKey?.let { body?.let { it1 -> request.pay(it, it1) } }
+            ?.enqueue(object : Callback<PayResponse> {
+                override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
+                    if (response.body()?.data != null && response.isSuccessful) {
+                        onSuccess(response.body()!!.data)
+                    } else {
+                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<PayResponse>, t: Throwable) {
-                onFail(t.message.toString())
-            }
-        })
+                override fun onFailure(call: Call<PayResponse>, t: Throwable) {
+                    onFail(t.message.toString())
+                }
+            })
     }
 
     // Custom Fields related methods
