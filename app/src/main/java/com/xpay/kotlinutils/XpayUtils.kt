@@ -168,28 +168,29 @@ object XpayUtils {
 
     // Transaction info related methods
 
-    fun getTransaction(
-        token: String,
-        communityID: String,
-        transactionUid: String,
-        onSuccess: (Transaction) -> Unit,
+    fun getTransactionDetail(
+        transactionUuid: String,
+        onSuccess: (TransactionData) -> Unit,
         onFail: (String) -> Unit
     ) {
-        val request = ServiceBuilder.xpayService(Xpay::class.java)
-        val call = request.getTransaction(token, communityID, transactionUid)
-        call.enqueue(object : Callback<Transaction> {
-            override fun onResponse(call: Call<Transaction>, response: Response<Transaction>) {
-                if (response.body() != null && response.isSuccessful && response.code() != 404) {
-                    onSuccess(response.body()!!)
-                } else {
-                    response.body()?.status?.message?.let { onFail(it) }
-                }
-            }
+        // check for API settings
+        checkAPISettings(false)
 
-            override fun onFailure(call: Call<Transaction>, t: Throwable) {
-                onFail(t.message.toString())
-            }
-        })
+        val request = ServiceBuilder.xpayService(Xpay::class.java)
+        communityId?.let { apiKey?.let { it1 -> request.getTransaction(it1, it, transactionUuid) } }
+            ?.enqueue(object : Callback<Transaction> {
+                override fun onResponse(call: Call<Transaction>, response: Response<Transaction>) {
+                    if (response.body() != null && response.isSuccessful && response.code() != 404) {
+                        onSuccess(response.body()!!.data)
+                    } else {
+                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
+                    }
+                }
+
+                override fun onFailure(call: Call<Transaction>, t: Throwable) {
+                    onFail(t.message.toString())
+                }
+            })
     }
 
     // Private Methods
@@ -198,9 +199,11 @@ object XpayUtils {
         throw IllegalArgumentException(message)
     }
 
-    private fun checkAPISettings() {
+    private fun checkAPISettings(checkVarId: Boolean = true) {
         apiKey ?: throwError("API key is not set")
         communityId ?: throwError("Community ID is not set")
-        variableAmountID ?: throwError("API Payment ID is not set")
+        if (checkVarId) {
+            variableAmountID ?: throwError("API Payment ID is not set")
+        }
     }
 }
