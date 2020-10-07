@@ -1,4 +1,4 @@
-package com.xpay.kotlinutil
+package com.xpay.kotlinutils
 
 import android.content.Context
 import android.widget.Toast
@@ -91,7 +91,7 @@ object XpayUtils {
         // check for API settings
         checkAPISettings()
 
-        variableAmountID?.let { body= RequestBody(it) }
+        variableAmountID?.let { body = RequestBody(it) }
         communityId?.let { body?.community_id = it }
 
         // Payment method
@@ -116,7 +116,7 @@ object XpayUtils {
 
         PaymentOptionsTotalAmounts
             ?: throwError("Total amount is not set, call prepareAmount method")
-        currency?.let { body?.currency=it }
+        currency?.let { body?.currency = it }
 
         if (payUsing == PaymentMethods.CASH) {
             shippingInfo?.let {
