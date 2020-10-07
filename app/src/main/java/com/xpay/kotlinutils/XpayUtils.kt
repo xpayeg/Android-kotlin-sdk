@@ -9,6 +9,7 @@ import com.xpay.kotlinutils.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 import kotlin.collections.HashMap
 
 object XpayUtils {
@@ -17,6 +18,7 @@ object XpayUtils {
     var apiKey: String? = null
     var communityId: String? = null
     var variableAmountID: Number? = null
+
     // Payment methods data
     var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
         private set
@@ -26,6 +28,7 @@ object XpayUtils {
     private val currency: String? = "EGP"
     var customFields = mutableListOf<CustomField>()
         private set
+
     // User data
     var userInfo: User? = null
     var shippingInfo: Info? = null
@@ -97,7 +100,7 @@ object XpayUtils {
         // Payment method
         payUsing?.let {
             if (it in activePaymentMethods) {
-                requestBody["pay_using"] = it
+                requestBody["pay_using"] = it.toString().toLowerCase(Locale.ROOT)
             }
 
             when (it) {
