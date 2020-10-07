@@ -186,7 +186,7 @@ object XpayUtils {
                 if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
                 } else {
-                    response.body()?.status?.message?.let { onFail(it) }
+                    response.body()?.status?.errors?.get(0)?.let { onFail(it) }
                 }
             }
 

@@ -11,16 +11,16 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface Xpay {
-    @POST("/api/v1/payments/prepare-amount/")
+    @POST("v1/payments/prepare-amount/")
     fun prepareAmount(@Body category: PrepareRequestBody, @Header("x-api-key") authToken: String): Call<PrepareAmountResponse>
 
-    @GET("/api/v1/communities/{community_id}/transactions/{transaction_uuid}/")
+    @GET("v1/communities/{community_id}/transactions/{transaction_uuid}/")
     fun getTransaction(
         @Header("x-api-key") authToken: String,
         @Path("community_id") id: String,
         @Path("transaction_uuid") m_id: String
     ): Call<TransactionResponse>
 
-    @POST("/api/v1/payments/pay/variable-amount")
+    @POST("v1/payments/pay/variable-amount")
     fun pay(@Header("x-api-key") authToken: String, @Body category: PayRequestBody): Call<PayResponse>
 }
