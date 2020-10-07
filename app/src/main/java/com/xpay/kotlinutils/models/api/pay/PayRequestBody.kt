@@ -6,7 +6,7 @@ import com.xpay.kotlinutils.models.PaymentMethods
 data class PayRequestBody(
     var variable_amount_id: Number? = null,
     var community_id: String? = null,
-    var pay_using: PaymentMethods? = null,
+    var pay_using: String? = null,
     var amount: Number? = null,
     var currency: String? = null,
     var billing_data: HashMap<String, Any>? = null,

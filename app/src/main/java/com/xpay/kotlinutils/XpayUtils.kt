@@ -15,6 +15,7 @@ import com.xpay.kotlinutils.models.api.transaction.TransactionResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 import kotlin.collections.HashMap
 
 object XpayUtils {
@@ -101,7 +102,7 @@ object XpayUtils {
         // Payment method
         payUsing?.let {
             if (it in activePaymentMethods) {
-                bodyPay.pay_using = it
+                bodyPay.pay_using = it.toString().toLowerCase(Locale.ROOT)
             }
 
             when (it) {
