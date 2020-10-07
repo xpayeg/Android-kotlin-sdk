@@ -1,6 +1,6 @@
-package com.xpay.kotlinutils.model
+package com.xpay.kotlinutils.models
 
-data class Info(
+data class ShippingInfo(
     var country: String,
     var city: String,
     var state: String,
@@ -8,5 +8,4 @@ data class Info(
     var building: String,
     var floor: String,
     var street: String
-) {
-}
+)

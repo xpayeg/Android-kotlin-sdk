@@ -1,4 +1,4 @@
-package com.xpay.kotlin.models
+package com.xpay.kotlinutils.models.api.pay
 
 import com.google.gson.annotations.SerializedName
 
