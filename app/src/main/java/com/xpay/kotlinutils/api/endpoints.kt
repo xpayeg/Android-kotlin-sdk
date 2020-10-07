@@ -11,45 +11,6 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface Xpay {
-
-    @GET("/api/users/{id}")
-    fun userInfo(
-        @Header("Authorization") authToken: String,
-        @Path("id") id: String
-    ): Call<ResponseBody>
-
-    @GET("/api/users/{id}/bills")
-    fun loadBills(
-        @Header("Authorization") authToken: String,
-        @Path("id") id: String
-    ): Call<ResponseBody>
-
-    @GET("/api/users/{id}/cards")
-    fun loadCards(
-        @Header("Authorization") authToken: String,
-        @Path("id") id: String
-    ): Call<ResponseBody>
-
-    @GET("/api/users/otp/send/")
-    fun login(@Body category: Map<String, Any>): Call<ResponseBody>
-
-    @GET("/api/v1/users/{u_id}/transactions/{t_id}")
-    fun getTransactionState(
-        @Header("Authorization") authToken: String,
-        @Path("u_id") id: String,
-        @Path("t_id") tId: String
-    ): Call<ResponseBody>
-
-    @GET("/api/users/otp/verify/")
-    fun verifyOtp(@Body category: Map<String, Any>): Call<ResponseBody>
-
-    @GET("/api/communities/{comm_id}/memberships/{member_id}/bills")
-    fun userBills(
-        @Header("Authorization") authToken: String,
-        @Path("comm_id") id: String,
-        @Path("member_id") m_id: String
-    ): Call<ResponseBody>
-
     @POST("/api/v1/payments/prepare-amount/")
     fun prepareAmount(@Body category: PrepareRequestBody, @Header("x-api-key") authToken: String): Call<PrepareAmountResponse>
 
