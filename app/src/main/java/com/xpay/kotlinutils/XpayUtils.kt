@@ -30,7 +30,6 @@ object XpayUtils {
     var payUsing: PaymentMethods? = null
 
     // Pay request body
-    private var bodyPay: PayRequestBody? = null
     var activePaymentMethods = mutableListOf<PaymentMethods>()
         private set
     private val currency: String? = "EGP"
@@ -64,20 +63,17 @@ object XpayUtils {
                     response: Response<PrepareAmountResponse>
                 ) {
                     if (response.body() != null && response.isSuccessful) {
+                        val preparedData = response.body()!!.data
+                        onSuccess(preparedData)
+                        preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
+                        preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
+                        preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
 
-                        if (response.body()!!.data != null) {
-                            val preparedData = response.body()!!.data
-                            onSuccess(preparedData)
-                            preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
-                            preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
-                            preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
-
-                            PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
-                                preparedData.total_amount,
-                                preparedData.CASH.total_amount,
-                                preparedData.KIOSK.total_amount
-                            )
-                        }
+                        PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
+                            preparedData.total_amount,
+                            preparedData.CASH.total_amount,
+                            preparedData.KIOSK.total_amount
+                        )
 
                     } else {
                         response.body()?.status?.errors?.get(0)?.let { onFail(it) }
