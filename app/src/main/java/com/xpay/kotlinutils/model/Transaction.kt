@@ -1,7 +1,7 @@
-package com.xpay.kotlin.models
+package com.xpay.kotlinutils.model
 
 import com.google.gson.annotations.SerializedName
-import java.util.*
+import com.xpay.kotlin.models.Status
 
 data class Transaction (
 
