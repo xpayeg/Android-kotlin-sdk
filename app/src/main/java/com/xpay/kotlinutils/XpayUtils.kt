@@ -24,6 +24,7 @@ object XpayUtils {
     var apiKey: String? = null
     var communityId: String? = null
     var variableAmountID: Number? = null
+    var serverSetting: ServerSetting = ServerSetting.TEST
 
     // Payment methods data
     var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
@@ -56,7 +57,7 @@ object XpayUtils {
         checkAPISettings()
 
         val body = PrepareRequestBody(communityId.toString(), amount)
-        val request = ServiceBuilder.xpayService(Xpay::class.java)
+        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
         apiKey?.let { request.prepareAmount(body, it) }
             ?.enqueue(object : Callback<PrepareAmountResponse> {
                 override fun onResponse(
@@ -121,7 +122,7 @@ object XpayUtils {
 
         PaymentOptionsTotalAmounts
             ?: throwError("Total amount is not set, call prepareAmount method")
-        currency?.let { bodyPay.currency =it }
+        currency?.let { bodyPay.currency = it }
 
         if (payUsing == PaymentMethods.CASH) {
             shippingShippingInfo?.let {
@@ -144,7 +145,7 @@ object XpayUtils {
         }
 
         // making a request
-        val request = ServiceBuilder.xpayService(Xpay::class.java)
+        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
         apiKey?.let { bodyPay.let { it1 -> request.pay(it, it1) } }
             ?.enqueue(object : Callback<PayResponse> {
                 override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
@@ -180,10 +181,13 @@ object XpayUtils {
         onSuccess: (TransactionResponse) -> Unit,
         onFail: (String) -> Unit
     ) {
-        val request = ServiceBuilder.xpayService(Xpay::class.java)
+        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
         val call = request.getTransaction(token, communityID, transactionUid)
         call.enqueue(object : Callback<TransactionResponse> {
-            override fun onResponse(call: Call<TransactionResponse>, response: Response<TransactionResponse>) {
+            override fun onResponse(
+                call: Call<TransactionResponse>,
+                response: Response<TransactionResponse>
+            ) {
                 if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
                 } else {
