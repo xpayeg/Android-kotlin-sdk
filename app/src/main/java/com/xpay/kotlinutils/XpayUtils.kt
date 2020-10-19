@@ -25,6 +25,10 @@ object XpayUtils {
     var communityId: String? = null
     var variableAmountID: Number? = null
     var serverSetting: ServerSetting = ServerSetting.TEST
+        set(value) {
+            field = value
+            request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
+        }
 
     // Payment methods data
     var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
@@ -42,6 +46,9 @@ object XpayUtils {
     var userInfo: User? = null
     var shippingShippingInfo: ShippingInfo? = null
 
+    // private settings
+    internal var request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
+
 
     fun welcomeMessage(context: Context) {
         Toast.makeText(context, "Welcome To XPay Sdk", Toast.LENGTH_LONG).show()
@@ -57,7 +64,7 @@ object XpayUtils {
         checkAPISettings()
 
         val body = PrepareRequestBody(communityId.toString(), amount)
-        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
+//        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
         apiKey?.let { request.prepareAmount(body, it) }
             ?.enqueue(object : Callback<PrepareAmountResponse> {
                 override fun onResponse(
@@ -145,7 +152,7 @@ object XpayUtils {
         }
 
         // making a request
-        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
+//        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
         apiKey?.let { bodyPay.let { it1 -> request.pay(it, it1) } }
             ?.enqueue(object : Callback<PayResponse> {
                 override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
@@ -181,7 +188,7 @@ object XpayUtils {
         onSuccess: (TransactionResponse) -> Unit,
         onFail: (String) -> Unit
     ) {
-        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
+//        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
         val call = request.getTransaction(token, communityID, transactionUid)
         call.enqueue(object : Callback<TransactionResponse> {
             override fun onResponse(
