@@ -1,0 +1,19 @@
+{
+  "status": {
+    "code": 200,
+    "message": "success",
+    "errors": []
+  },
+  "data": {
+    "iframe_url": "https://dev-payment.xpay.app/core/payment_iframe/5697/?is_pt_trx=1",
+    "transaction_id": 5345,
+    "transaction_status": "PENDING",
+    "transaction_uuid": "00b42bad-77e0-4e63-a715-a60863216fd8",
+    "message": null,
+    "bill_reference": null,
+    "bm_session": null
+  },
+  "count": null,
+  "next": null,
+  "previous": null
+}

@@ -31,8 +31,8 @@ object XpayUtils {
         }
 
     // Payment methods data
-    var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
-        private set
+    internal var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
+//        private set
     var payUsing: PaymentMethods? = null
 
     // Pay request body
