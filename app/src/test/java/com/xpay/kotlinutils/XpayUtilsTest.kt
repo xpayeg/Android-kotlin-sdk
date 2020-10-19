@@ -44,6 +44,11 @@ class XpayUtilsTest {
         XpayUtils.prepareAmount(50, ::userSuccess, ::userFailure)
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun pay_noSettings_throwsError() {
+        XpayUtils.pay(::paySuccess, ::payFailure)
+    }
+
     @Test
     fun prepareAmount_allSettings_throwserror() {
         // test settings
@@ -64,6 +69,17 @@ class XpayUtilsTest {
         assertEquals("/v1/payments/prepare-amount/", request.path)
         assertNotNull(request.getHeader("x-api-key"))
         println(request.body)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun pay_noSettings_pay_using_throwsError() {
+        XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
+        XpayUtils.communityId = "zogDmQW"
+        XpayUtils.variableAmountID = 18
+        XpayUtils.prepareAmount(50, ::userSuccess, ::userFailure)
+        val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
+        XpayUtils.request = serviceRequest
+        XpayUtils.pay(::paySuccess, ::payFailure)
     }
 
     @Test
