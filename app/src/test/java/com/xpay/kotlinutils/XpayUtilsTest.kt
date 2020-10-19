@@ -118,6 +118,26 @@ class XpayUtilsTest {
         println(request.requestUrl)
     }
 
+    @Test(expected = IllegalArgumentException::class) // User information is not set
+    fun pay_userInfoNotSet_throwError() {
+
+        XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
+        XpayUtils.communityId = "zogDmQW"
+        XpayUtils.variableAmountID = 18
+        XpayUtils.payUsing = PaymentMethods.KIOSK
+        XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
+        val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
+        XpayUtils.request = serviceRequest
+
+        mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PayResponse.json")))
+        XpayUtils.pay({ x: PayData -> println(x) }, ::payFailure)
+
+        val request: RecordedRequest = mockWebServer.takeRequest()
+        assertEquals("/v1/payments/pay/variable-amount", request.path)
+        assertNotNull(request.getHeader("x-api-key"))
+        println(request.requestUrl)
+    }
+
     @After
     fun tearDown() {
         mockWebServer.shutdown()
