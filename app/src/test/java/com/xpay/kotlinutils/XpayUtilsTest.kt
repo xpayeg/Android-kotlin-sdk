@@ -20,6 +20,7 @@ import org.junit.Test
 
 class XpayUtilsTest {
     private val mockWebServer = MockWebServer()
+    private val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
 
     @Before
     fun setUp() {
@@ -77,7 +78,6 @@ class XpayUtilsTest {
         XpayUtils.communityId = "zogDmQW"
         XpayUtils.variableAmountID = 18
         XpayUtils.prepareAmount(50, ::userSuccess, ::userFailure)
-        val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
         XpayUtils.request = serviceRequest
         XpayUtils.pay(::paySuccess, ::payFailure)
     }
@@ -91,26 +91,23 @@ class XpayUtilsTest {
         XpayUtils.PaymentOptionsTotalAmounts =
             PaymentOptionsTotalAmounts(cash = 50.0, kiosk = 52.85)
         XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
-        XpayUtils.prepareAmount(50, ::userSuccess, ::userFailure)
-        val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
         XpayUtils.request = serviceRequest
         XpayUtils.pay(::paySuccess, ::payFailure)
     }
 
     @Test
-    fun pay_allSetting_throwError() {
-
+    fun pay_allSetting_passDataSuccessfully() {
+        // test settings
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
         XpayUtils.communityId = "zogDmQW"
         XpayUtils.variableAmountID = 18
         XpayUtils.payUsing = PaymentMethods.CARD
         XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
         XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
-        val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
         XpayUtils.request = serviceRequest
 
         mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PayResponse.json")))
-        XpayUtils.pay({ x: PayData -> println(x) }, ::payFailure)
+        XpayUtils.pay(::paySuccess, ::payFailure)
 
         val request: RecordedRequest = mockWebServer.takeRequest()
         assertEquals("/v1/payments/pay/variable-amount", request.path)
@@ -126,7 +123,6 @@ class XpayUtilsTest {
         XpayUtils.variableAmountID = 18
         XpayUtils.payUsing = PaymentMethods.KIOSK
         XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
-        val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
         XpayUtils.request = serviceRequest
 
         mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PayResponse.json")))
