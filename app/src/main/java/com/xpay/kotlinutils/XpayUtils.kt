@@ -12,6 +12,10 @@ import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareRequestBody
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
 import com.xpay.kotlinutils.models.api.transaction.TransactionResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,7 +36,8 @@ object XpayUtils {
 
     // Payment methods data
     internal var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
-//        private set
+
+    //        private set
     var payUsing: PaymentMethods? = null
 
     // Pay request body
@@ -62,37 +67,54 @@ object XpayUtils {
         onFail: (String) -> Unit
     ) {
         checkAPISettings()
-
         val body = PrepareRequestBody(communityId.toString(), amount)
+        GlobalScope.launch(Dispatchers.IO) {
+            val res = apiKey?.let { request.prepareAmount(body, it) }
+            if (res?.body() != null && res.isSuccessful) {
+                val preparedData = res.body()!!.data
+                onSuccess(preparedData)
+                preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
+                preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
+                preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
+                PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
+                    preparedData.total_amount,
+                    preparedData.CASH.total_amount,
+                    preparedData.KIOSK.total_amount
+                )
+            } else {
+                res?.body()?.status?.errors?.get(0)?.let { onFail(it) }
+            }
+        }
+//        val body = PrepareRequestBody(communityId.toString(), amount)
 //        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
-        apiKey?.let { request.prepareAmount(body, it) }
-            ?.enqueue(object : Callback<PrepareAmountResponse> {
-                override fun onResponse(
-                    call: Call<PrepareAmountResponse>,
-                    response: Response<PrepareAmountResponse>
-                ) {
-                    if (response.body() != null && response.isSuccessful) {
-                        val preparedData = response.body()!!.data
-                        onSuccess(preparedData)
-                        preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
-                        preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
-                        preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
-
-                        PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
-                            preparedData.total_amount,
-                            preparedData.CASH.total_amount,
-                            preparedData.KIOSK.total_amount
-                        )
-
-                    } else {
-                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
-                    }
-                }
-
-                override fun onFailure(call: Call<PrepareAmountResponse>, t: Throwable) {
-                    onFail(t.message.toString())
-                }
-            })
+//        apiKey?.let { request.prepareAmount(body, it) }
+//            ?.enqueue(object : Callback<PrepareAmountResponse> {
+//                override fun onResponse(
+//                    call: Call<PrepareAmountResponse>,
+//                    response: Response<PrepareAmountResponse>
+//                ) {
+//                    if (response.body() != null && response.isSuccessful) {
+//                        val preparedData = response.body()!!.data
+//                        onSuccess(preparedData)
+//                        preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
+//                        preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
+//                        preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
+//
+//                        PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
+//                            preparedData.total_amount,
+//                            preparedData.CASH.total_amount,
+//                            preparedData.KIOSK.total_amount
+//                        )
+//
+//                    } else {
+//                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
+//                    }
+//                }
+//
+//                override fun onFailure(call: Call<PrepareAmountResponse>, t: Throwable) {
+//                    onFail(t.message.toString())
+//                }
+//            })
     }
 
     fun pay(
@@ -150,23 +172,29 @@ object XpayUtils {
         if (customFields.size > 0) {
             bodyPay.custom_fields = customFields
         }
-
         // making a request
-//        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
-        apiKey?.let { bodyPay.let { it1 -> request.pay(it, it1) } }
-            ?.enqueue(object : Callback<PayResponse> {
-                override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
-                    if (response.body()?.data != null && response.isSuccessful) {
-                        onSuccess(response.body()!!.data)
-                    } else {
-                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
-                    }
-                }
-
-                override fun onFailure(call: Call<PayResponse>, t: Throwable) {
-                    onFail(t.message.toString())
-                }
-            })
+        GlobalScope.launch(Dispatchers.IO) {
+            val res=  apiKey?.let { request.pay(it,bodyPay) }
+            if (res?.body() != null && res.isSuccessful) {
+                onSuccess(res.body()!!.data)
+            }else{
+                res!!.body()?.status?.errors?.get(0)?.let { onFail(it) }
+            }
+        }
+//        apiKey?.let { bodyPay.let { it1 -> request.pay(it, it1) } }
+//            ?.enqueue(object : Callback<PayResponse> {
+//                override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
+//                    if (response.body()?.data != null && response.isSuccessful) {
+//                        onSuccess(response.body()!!.data)
+//                    } else {
+//                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
+//                    }
+//                }
+//
+//                override fun onFailure(call: Call<PayResponse>, t: Throwable) {
+//                    onFail(t.message.toString())
+//                }
+//            })
     }
 
     // Custom Fields related methods

@@ -1,5 +1,7 @@
 package com.xpay.kotlinutils
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.xpay.kotlinutils.api.ServiceBuilder
 import com.xpay.kotlinutils.api.Xpay
 import com.xpay.kotlinutils.models.PaymentMethods
@@ -8,6 +10,7 @@ import com.xpay.kotlinutils.models.ServerSetting
 import com.xpay.kotlinutils.models.User
 import com.xpay.kotlinutils.models.api.pay.PayData
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
+import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import okhttp3.mockwebserver.MockResponse
@@ -20,7 +23,8 @@ import org.junit.Test
 
 class XpayUtilsTest {
     private val mockWebServer = MockWebServer()
-    private val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
+    private val serviceRequest =
+        ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
 
     @Before
     fun setUp() {
@@ -58,18 +62,23 @@ class XpayUtilsTest {
         XpayUtils.variableAmountID = 18
         val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
         XpayUtils.request = serviceRequest
+        val prepareAmountResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
 
+        val gson = Gson()
+        val listPersonType = object : TypeToken<PrepareAmountResponse>() {}.type
+        val prepareAmountMock: PrepareAmountResponse =
+            gson.fromJson(prepareAmountResponseBody, listPersonType)
+        val prepareDataObject: PrepareAmountData = prepareAmountMock.data
+        val prepareData: PrepareAmountData? = null
         // Schedule some responses.
         mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
-
-        // call our methods
-        XpayUtils.prepareAmount(50, { x: PrepareAmountData -> println(x) }, ::userFailure)
-
+        XpayUtils.prepareAmount(80, ::userSuccess, ::userFailure)
+        print(prepareDataObject)
         // assertion
         val request: RecordedRequest = mockWebServer.takeRequest()
         assertEquals("/v1/payments/prepare-amount/", request.path)
         assertNotNull(request.getHeader("x-api-key"))
-        println(request.body)
+//        println(request.body)
     }
 
     @Test(expected = IllegalArgumentException::class)
