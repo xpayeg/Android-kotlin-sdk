@@ -19,6 +19,7 @@ import okhttp3.Dispatcher
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -41,8 +42,8 @@ object XpayUtils {
     var payUsing: PaymentMethods? = null
 
     // Pay request body
-    var activePaymentMethods = mutableListOf<PaymentMethods>()
-        private set
+    internal var activePaymentMethods = mutableListOf<PaymentMethods>()
+//        private set
     private val currency: String? = "EGP"
     var customFields = mutableListOf<CustomField>()
         private set
@@ -61,69 +62,33 @@ object XpayUtils {
 
     // Payments related methods
 
-    fun prepareAmount(
-        amount: Number,
-        onSuccess: (PrepareAmountData) -> Unit,
-        onFail: (String) -> Unit
-    ) {
+    suspend fun prepareAmount(
+        amount: Number
+    ): PrepareAmountData? {
         checkAPISettings()
+        var preparedData: PrepareAmountData? = null
         val body = PrepareRequestBody(communityId.toString(), amount)
-        GlobalScope.launch(Dispatchers.IO) {
-            val res = apiKey?.let { request.prepareAmount(body, it) }
-            if (res?.body() != null && res.isSuccessful) {
-                val preparedData = res.body()!!.data
-                onSuccess(preparedData)
-                preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
-                preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
-                preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
-                PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
-                    preparedData.total_amount,
-                    preparedData.CASH.total_amount,
-                    preparedData.KIOSK.total_amount
-                )
-            } else {
-                res?.body()?.status?.errors?.get(0)?.let { onFail(it) }
-            }
+        val res = apiKey?.let { request.prepareAmount(body, it) }
+        if (res?.body() != null && res.isSuccessful) {
+            preparedData = res.body()!!.data
+            preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
+            preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
+            preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
+            PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
+                preparedData.total_amount,
+                preparedData.CASH.total_amount,
+                preparedData.KIOSK.total_amount
+            )
+        } else {
+            res?.body()?.status?.errors?.get(0)?.let { throwError(it) }
         }
-//        val body = PrepareRequestBody(communityId.toString(), amount)
-//        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
-//        apiKey?.let { request.prepareAmount(body, it) }
-//            ?.enqueue(object : Callback<PrepareAmountResponse> {
-//                override fun onResponse(
-//                    call: Call<PrepareAmountResponse>,
-//                    response: Response<PrepareAmountResponse>
-//                ) {
-//                    if (response.body() != null && response.isSuccessful) {
-//                        val preparedData = response.body()!!.data
-//                        onSuccess(preparedData)
-//                        preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
-//                        preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
-//                        preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
-//
-//                        PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
-//                            preparedData.total_amount,
-//                            preparedData.CASH.total_amount,
-//                            preparedData.KIOSK.total_amount
-//                        )
-//
-//                    } else {
-//                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<PrepareAmountResponse>, t: Throwable) {
-//                    onFail(t.message.toString())
-//                }
-//            })
+        return preparedData
     }
 
-    fun pay(
-        onSuccess: (PayData) -> Unit,
-        onFail: (String) -> Unit
-    ) {
+    suspend fun pay(): PayData? {
         // check for API settings
         checkAPISettings()
-
+        var preparedData: PayData? = null
         val bodyPay = PayRequestBody()
 
         variableAmountID?.let { bodyPay.variable_amount_id = it }
@@ -133,13 +98,15 @@ object XpayUtils {
         payUsing?.let {
             if (it in activePaymentMethods) {
                 bodyPay.pay_using = it.toString().toLowerCase(Locale.ROOT)
+                when (it) {
+                    PaymentMethods.CARD -> bodyPay.amount = PaymentOptionsTotalAmounts?.card!!
+                    PaymentMethods.CASH -> bodyPay.amount = PaymentOptionsTotalAmounts?.cash!!
+                    PaymentMethods.KIOSK -> bodyPay.amount = PaymentOptionsTotalAmounts?.kiosk!!
+                }
+            } else {
+                throwError("Payment method is not available")
             }
 
-            when (it) {
-                PaymentMethods.CARD -> bodyPay.amount = PaymentOptionsTotalAmounts?.card!!
-                PaymentMethods.CASH -> bodyPay.amount = PaymentOptionsTotalAmounts?.cash!!
-                PaymentMethods.KIOSK -> bodyPay.amount = PaymentOptionsTotalAmounts?.kiosk!!
-            }
         } ?: throwError("Payment method is not set")
 
         // Billing information
@@ -168,33 +135,17 @@ object XpayUtils {
         bodyPay.billing_data = billingData
 
         // custom fields
-        val customBody: List<CustomField>
+//        val customBody: List<CustomField>
         if (customFields.size > 0) {
             bodyPay.custom_fields = customFields
         }
-        // making a request
-        GlobalScope.launch(Dispatchers.IO) {
-            val res=  apiKey?.let { request.pay(it,bodyPay) }
-            if (res?.body() != null && res.isSuccessful) {
-                onSuccess(res.body()!!.data)
-            }else{
-                res!!.body()?.status?.errors?.get(0)?.let { onFail(it) }
-            }
+        val res = apiKey?.let { request.pay(it, bodyPay) }
+        if (res?.body() != null && res.isSuccessful) {
+            preparedData = res.body()!!.data
+        } else {
+            res!!.body()?.status?.errors?.get(0)?.let { throwError(it) }
         }
-//        apiKey?.let { bodyPay.let { it1 -> request.pay(it, it1) } }
-//            ?.enqueue(object : Callback<PayResponse> {
-//                override fun onResponse(call: Call<PayResponse>, response: Response<PayResponse>) {
-//                    if (response.body()?.data != null && response.isSuccessful) {
-//                        onSuccess(response.body()!!.data)
-//                    } else {
-//                        response.body()?.status?.errors?.get(0)?.let { onFail(it) }
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<PayResponse>, t: Throwable) {
-//                    onFail(t.message.toString())
-//                }
-//            })
+        return preparedData
     }
 
     // Custom Fields related methods
