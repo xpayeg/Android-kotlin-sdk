@@ -203,6 +203,29 @@ class XpayUtilsTest {
         assertEquals(request.getHeader("x-api-key"), XpayUtils.apiKey)
     }
 
+   //  pay returns error to is failed (no network errors- server error)
+    @Test
+    fun pay_returnsErrorToIsFailed_throwsError(){
+       // test settings
+       XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
+       XpayUtils.communityId = "120"
+       XpayUtils.variableAmountID = 0
+       // simulate prepare amount method
+       XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
+       XpayUtils.activePaymentMethods =
+           mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
+
+       XpayUtils.payUsing = PaymentMethods.CARD
+       XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
+       XpayUtils.request = serviceRequest
+       val payResponseBody = FileUtils.readTestResourceFile("PayResponseError.json")
+       // Schedule some responses.
+       mockWebServer.enqueue(MockResponse().setResponseCode(400).setBody(payResponseBody))
+
+       runBlocking {
+          XpayUtils.pay()
+       }
+   }
 
     @After
     fun tearDown() {
