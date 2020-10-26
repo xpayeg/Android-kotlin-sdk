@@ -76,7 +76,7 @@ class XpayUtilsTest {
 
     // check that prepare amount sets payment options successfully
     @Test
-    fun prepareAmount_setsPaymentOptionsSuccessfully() {
+    fun prepareAmount_setsPaymentOptionsSuccessfully_isPassed() {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
         XpayUtils.communityId = "zogDmQW"
         XpayUtils.variableAmountID = 18
@@ -89,6 +89,24 @@ class XpayUtilsTest {
         }
         // assertion
         assertFalse(XpayUtils.activePaymentMethods.isEmpty());
+    }
+
+    // check that prepare amount set total prepared amount successfull
+    @Test
+    fun prepareAmount_setsTotalPreparedAmountSuccessfully_isPassed(){
+        XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
+        XpayUtils.communityId = "zogDmQW"
+        XpayUtils.variableAmountID = 18
+        XpayUtils.request = serviceRequest
+        val prepareAmountResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
+        mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
+        mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
+
+        runBlocking {
+            XpayUtils.prepareAmount(80)
+        }
+        // assertion
+       assertNotNull(XpayUtils.PaymentOptionsTotalAmounts)
     }
 
     // pay method tests
