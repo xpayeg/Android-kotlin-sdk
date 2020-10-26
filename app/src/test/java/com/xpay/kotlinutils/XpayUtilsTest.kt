@@ -71,7 +71,7 @@ class XpayUtilsTest {
         val prepareAmountMock: PrepareAmountResponse =
             gson.fromJson(prepareAmountResponseBody, listPersonType)
         val prepareDataObject: PrepareAmountData = prepareAmountMock.data
-        var prepareData: PrepareAmountData?
+        var prepareData: PrepareAmountData?=null
 
         // Schedule some responses.
         mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
