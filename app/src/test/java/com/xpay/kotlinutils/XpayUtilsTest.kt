@@ -71,7 +71,7 @@ class XpayUtilsTest {
         val prepareAmountMock: PrepareAmountResponse =
             gson.fromJson(prepareAmountResponseBody, listPersonType)
         val prepareDataObject: PrepareAmountData = prepareAmountMock.data
-        var prepareData: PrepareAmountData?=null
+        var prepareData: PrepareAmountData? = null
 
         // Schedule some responses.
         mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
@@ -90,6 +90,7 @@ class XpayUtilsTest {
 
     // pay method tests
 
+    // pay returns error without settings
     @Test(expected = IllegalArgumentException::class)
     fun pay_noSettings_throwsError() {
         runBlocking {
@@ -97,7 +98,7 @@ class XpayUtilsTest {
         }
     }
 
-
+    // pay returns error when called without setting pay using
     @Test(expected = IllegalArgumentException::class)
     fun pay_payUsingNotDefined_throwsError() {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
@@ -109,6 +110,7 @@ class XpayUtilsTest {
         }
     }
 
+    // pay returns error when payment method is not available in payment options
     @Test(expected = IllegalArgumentException::class)
     fun pay_paymentMethodNotAvailable_throwsError() {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
@@ -116,7 +118,6 @@ class XpayUtilsTest {
         XpayUtils.variableAmountID = 18
         XpayUtils.PaymentOptionsTotalAmounts =
             PaymentOptionsTotalAmounts(cash = 50.0, kiosk = 52.85)
-//        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
         XpayUtils.payUsing = PaymentMethods.CARD
         XpayUtils.request = serviceRequest
         runBlocking {
@@ -124,7 +125,7 @@ class XpayUtilsTest {
         }
     }
 
-    // User information is not set
+    // pay returns error when user informations is missing
     @Test(expected = IllegalArgumentException::class)
     fun pay_userInfoNotSet_throwError() {
 
@@ -139,7 +140,31 @@ class XpayUtilsTest {
         }
     }
 
+    // pay sends correct payload
+    @Test
+    fun pay_sendsCorrectPayload_Passed(){
+        // test settings
+        XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
+        XpayUtils.communityId = "zogDmQW"
+        XpayUtils.variableAmountID = 18
 
+        // simulate prepare amount method
+        XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
+        XpayUtils.activePaymentMethods =
+            mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
+
+        XpayUtils.payUsing = PaymentMethods.CARD
+        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
+        XpayUtils.request = serviceRequest
+        val payResponseBody = FileUtils.readTestResourceFile("PayResponse.json")
+        mockWebServer.enqueue(MockResponse().setBody(payResponseBody))
+
+        runBlocking {
+          XpayUtils.pay()
+        }
+    }
+
+    // pay passes pay to is successful on successful operation
     @Test
     fun pay_allSetting_passDataSuccessfully() {
         // test settings
