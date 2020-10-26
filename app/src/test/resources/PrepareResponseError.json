@@ -1,0 +1,17 @@
+{
+  "status": {
+    "code": 400,
+    "message": "",
+    "errors": [
+      {
+        "amount": [
+          "Ensure this value is greater than or equal to 5."
+        ]
+      }
+    ]
+  },
+  "data": {},
+  "count": null,
+  "next": null,
+  "previous": null
+}

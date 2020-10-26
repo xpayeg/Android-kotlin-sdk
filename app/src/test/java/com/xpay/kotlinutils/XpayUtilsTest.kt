@@ -99,14 +99,25 @@ class XpayUtilsTest {
         XpayUtils.variableAmountID = 18
         XpayUtils.request = serviceRequest
         val prepareAmountResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
-        mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
-        mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
+        mockWebServer.enqueue(MockResponse().setBody(prepareAmountResponseBody))
 
         runBlocking {
             XpayUtils.prepareAmount(80)
         }
         // assertion
        assertNotNull(XpayUtils.PaymentOptionsTotalAmounts)
+    }
+
+    // check that prepare amount returns error to is failed (no network errors- server error)
+    @Test
+    fun prepareAmount_returnsErrorToIsFailed_throwsError(){
+        XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
+        XpayUtils.communityId = "zogDmQW"
+        XpayUtils.variableAmountID = 18
+        XpayUtils.request = serviceRequest
+        val payResponseBody = FileUtils.readTestResourceFile("PrepareResponseError.json")
+        // Schedule some responses.
+        mockWebServer.enqueue(MockResponse().setResponseCode(400).setBody(payResponseBody))
     }
 
     // pay method tests
