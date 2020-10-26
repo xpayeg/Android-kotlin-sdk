@@ -12,7 +12,7 @@ import com.xpay.kotlinutils.models.api.pay.PayData
 import com.xpay.kotlinutils.models.api.pay.PayResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
-import junit.framework.Assert.assertEquals
+import junit.framework.Assert.*
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -33,19 +33,6 @@ class XpayUtilsTest {
         mockWebServer.start(8080)
     }
 
-    fun userSuccess(res: PrepareAmountData) {
-    }
-
-    fun userFailure(res: String) {
-    }
-
-    fun paySuccess(res: PayData) {
-    }
-
-    fun payFailure(res: String) {
-    }
-
-
     // Prepare method tests
 
     @Test(expected = IllegalArgumentException::class)
@@ -61,7 +48,6 @@ class XpayUtilsTest {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
         XpayUtils.communityId = "zogDmQW"
         XpayUtils.variableAmountID = 18
-        val serviceRequest = ServiceBuilder(ServerSetting.TEST, true).xpayService(Xpay::class.java)
         XpayUtils.request = serviceRequest
         val prepareAmountResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
 
@@ -85,6 +71,24 @@ class XpayUtilsTest {
         val request: RecordedRequest = mockWebServer.takeRequest()
         assertEquals("/v1/payments/prepare-amount/", request.path)
         assertEquals(request.getHeader("x-api-key"), XpayUtils.apiKey)
+    }
+
+
+    // check that prepare amount sets payment options successfully
+    @Test
+    fun prepareAmount_setsPaymentOptionsSuccessfully() {
+        XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
+        XpayUtils.communityId = "zogDmQW"
+        XpayUtils.variableAmountID = 18
+        XpayUtils.request = serviceRequest
+        val prepareAmountResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
+        mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
+
+        runBlocking {
+            XpayUtils.prepareAmount(80)
+        }
+        // assertion
+        assertFalse(XpayUtils.activePaymentMethods.isEmpty());
     }
 
     // pay method tests
