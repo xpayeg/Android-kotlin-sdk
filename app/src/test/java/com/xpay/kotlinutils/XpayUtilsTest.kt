@@ -13,15 +13,14 @@ import com.xpay.kotlinutils.models.api.pay.PayResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
 import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import okhttp3.mockwebserver.SocketPolicy
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 
 class XpayUtilsTest {
@@ -142,7 +141,7 @@ class XpayUtilsTest {
 
     // pay sends correct payload
     @Test
-    fun pay_sendsCorrectPayload_Passed(){
+    fun pay_sendsCorrectPayload_Passed() {
         // test settings
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
         XpayUtils.communityId = "zogDmQW"
@@ -160,7 +159,7 @@ class XpayUtilsTest {
         mockWebServer.enqueue(MockResponse().setBody(payResponseBody))
 
         runBlocking {
-          XpayUtils.pay()
+            XpayUtils.pay()
         }
     }
 
@@ -203,29 +202,40 @@ class XpayUtilsTest {
         assertEquals(request.getHeader("x-api-key"), XpayUtils.apiKey)
     }
 
-   //  pay returns error to is failed (no network errors- server error)
+    //  pay returns error to is failed (no network errors- server error)
     @Test
-    fun pay_returnsErrorToIsFailed_throwsError(){
-       // test settings
-       XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
-       XpayUtils.communityId = "120"
-       XpayUtils.variableAmountID = 0
-       // simulate prepare amount method
-       XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
-       XpayUtils.activePaymentMethods =
-           mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
+    fun pay_returnsErrorToIsFailed_throwsError() {
+        // test settings
+        XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
+        XpayUtils.communityId = "120"
+        XpayUtils.variableAmountID = 0
+        // simulate prepare amount method
+        XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
+        XpayUtils.activePaymentMethods =
+            mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
 
-       XpayUtils.payUsing = PaymentMethods.CARD
-       XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
-       XpayUtils.request = serviceRequest
-       val payResponseBody = FileUtils.readTestResourceFile("PayResponseError.json")
-       // Schedule some responses.
-       mockWebServer.enqueue(MockResponse().setResponseCode(400).setBody(payResponseBody))
+        XpayUtils.payUsing = PaymentMethods.CARD
+        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
+        XpayUtils.request = serviceRequest
+        val payResponseBody = FileUtils.readTestResourceFile("PayResponseError.json")
+        // Schedule some responses.
+        mockWebServer.enqueue(MockResponse().setResponseCode(400).setBody(payResponseBody))
 
-       runBlocking {
-          XpayUtils.pay()
-       }
-   }
+        runBlocking {
+            XpayUtils.pay()
+        }
+    }
+
+    // pay returns error to is failed (network error)
+    @Test
+    fun pay_networkError_throwsError() {
+        //  SocketPolicy.DISCONNECT_AT_START, SocketPolicy.NO_RESPONSE
+
+        val response = MockResponse()
+            .setSocketPolicy(SocketPolicy.DISCONNECT_AT_START)
+
+        mockWebServer.enqueue(response)
+    }
 
     @After
     fun tearDown() {
