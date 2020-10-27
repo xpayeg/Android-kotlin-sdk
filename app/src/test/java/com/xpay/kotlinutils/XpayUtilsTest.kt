@@ -81,43 +81,52 @@ class XpayUtilsTest {
         XpayUtils.communityId = "zogDmQW"
         XpayUtils.variableAmountID = 18
         XpayUtils.request = serviceRequest
-        val prepareAmountResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
         mockWebServer.enqueue(MockResponse().setBody(FileUtils.readTestResourceFile("PrepareAmountResponse.json")))
-
+        val testPaymentMethods = mutableListOf<PaymentMethods>(
+            PaymentMethods.CARD,
+            PaymentMethods.CASH,
+            PaymentMethods.KIOSK
+        )
         runBlocking {
             XpayUtils.prepareAmount(80)
         }
-        // assertion
+        // assertionmutableListOf
         assertFalse(XpayUtils.activePaymentMethods.isEmpty());
+        assertEquals(XpayUtils.activePaymentMethods, testPaymentMethods);
     }
 
     // check that prepare amount set total prepared amount successfull
     @Test
-    fun prepareAmount_setsTotalPreparedAmountSuccessfully_isPassed(){
+    fun prepareAmount_setsTotalPreparedAmountSuccessfully_isPassed() {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
         XpayUtils.communityId = "zogDmQW"
         XpayUtils.variableAmountID = 18
         XpayUtils.request = serviceRequest
         val prepareAmountResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
         mockWebServer.enqueue(MockResponse().setBody(prepareAmountResponseBody))
-
+        val testPaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(card=5002.0, cash=5000.0, kiosk=5285.0)
         runBlocking {
             XpayUtils.prepareAmount(80)
         }
         // assertion
-       assertNotNull(XpayUtils.PaymentOptionsTotalAmounts)
+        assertNotNull(XpayUtils.PaymentOptionsTotalAmounts)
+        assertEquals(XpayUtils.PaymentOptionsTotalAmounts, testPaymentOptionsTotalAmounts)
     }
 
     // check that prepare amount returns error to is failed (no network errors- server error)
     @Test
-    fun prepareAmount_returnsErrorToIsFailed_throwsError(){
+    fun prepareAmount_returnsErrorToIsFailed_throwsError() {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
-        XpayUtils.communityId = "zogDmQW"
-        XpayUtils.variableAmountID = 18
+        XpayUtils.communityId = "9"
+        XpayUtils.variableAmountID = 1
         XpayUtils.request = serviceRequest
-        val payResponseBody = FileUtils.readTestResourceFile("PrepareResponseError.json")
+        val prepareResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
         // Schedule some responses.
-        mockWebServer.enqueue(MockResponse().setResponseCode(400).setBody(payResponseBody))
+        mockWebServer.enqueue(MockResponse().setBody(prepareResponseBody))
+
+        runBlocking {
+            XpayUtils.prepareAmount(60)
+        }
     }
 
     // pay method tests
@@ -148,6 +157,8 @@ class XpayUtilsTest {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
         XpayUtils.communityId = "zogDmQW"
         XpayUtils.variableAmountID = 18
+        XpayUtils.activePaymentMethods =
+            mutableListOf(PaymentMethods.CASH, PaymentMethods.KIOSK)
         XpayUtils.PaymentOptionsTotalAmounts =
             PaymentOptionsTotalAmounts(cash = 50.0, kiosk = 52.85)
         XpayUtils.payUsing = PaymentMethods.CARD
@@ -164,6 +175,8 @@ class XpayUtilsTest {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
         XpayUtils.communityId = "zogDmQW"
         XpayUtils.variableAmountID = 18
+        XpayUtils.activePaymentMethods =
+            mutableListOf(PaymentMethods.CASH, PaymentMethods.KIOSK)
         XpayUtils.payUsing = PaymentMethods.KIOSK
         XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
         XpayUtils.request = serviceRequest
@@ -191,9 +204,21 @@ class XpayUtilsTest {
         val payResponseBody = FileUtils.readTestResourceFile("PayResponse.json")
         mockWebServer.enqueue(MockResponse().setBody(payResponseBody))
 
+        val gson = Gson()
+        val listPayType = object : TypeToken<PayResponse>() {}.type
+        val payMock: PayResponse =
+            gson.fromJson(payResponseBody, listPayType)
+        val payDataObject: PayData = payMock.data
+        var payResponseData: PayData? = null
+
         runBlocking {
-            XpayUtils.pay()
+             payResponseData = XpayUtils.pay()
         }
+        // assertion
+        assertEquals(payResponseData, payDataObject)
+        val request: RecordedRequest = mockWebServer.takeRequest()
+        assertEquals("/v1/payments/pay/variable-amount", request.path)
+        assertEquals(request.getHeader("x-api-key"), XpayUtils.apiKey)
     }
 
     // pay passes pay to is successful on successful operation
