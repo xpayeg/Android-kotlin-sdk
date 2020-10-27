@@ -260,8 +260,9 @@ class XpayUtilsTest {
     }
 
     // pay returns error to is failed (network error)
+    //check that prepare amount returns error to is failed (network error)
     @Test
-    fun pay_networkError_throwsError() {
+    fun general_networkError_throwsError() {
         //  SocketPolicy.DISCONNECT_AT_START, SocketPolicy.NO_RESPONSE
 
         val response = MockResponse()
