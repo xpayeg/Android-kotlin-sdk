@@ -4,10 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.xpay.kotlinutils.api.ServiceBuilder
 import com.xpay.kotlinutils.api.Xpay
-import com.xpay.kotlinutils.models.PaymentMethods
-import com.xpay.kotlinutils.models.PaymentOptionsTotalAmounts
-import com.xpay.kotlinutils.models.ServerSetting
-import com.xpay.kotlinutils.models.User
+import com.xpay.kotlinutils.models.*
 import com.xpay.kotlinutils.models.api.pay.PayData
 import com.xpay.kotlinutils.models.api.pay.PayResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
@@ -33,6 +30,16 @@ class XpayUtilsTest {
         mockWebServer.start(8080)
     }
 
+    fun reset() {
+        XpayUtils.apiKey = null;
+        XpayUtils.activePaymentMethods.clear()
+        XpayUtils.communityId = null
+        XpayUtils.variableAmountID = null
+        XpayUtils.PaymentOptionsTotalAmounts = null
+        XpayUtils.payUsing = null
+        XpayUtils.userInfo = null
+        XpayUtils.shippingShippingInfo = null
+    }
     // Prepare method tests
 
     @Test(expected = IllegalArgumentException::class)
@@ -40,6 +47,7 @@ class XpayUtilsTest {
         runBlocking {
             XpayUtils.prepareAmount(50)
         }
+        reset()
     }
 
     @Test
@@ -71,6 +79,7 @@ class XpayUtilsTest {
         val request: RecordedRequest = mockWebServer.takeRequest()
         assertEquals("/v1/payments/prepare-amount/", request.path)
         assertEquals(request.getHeader("x-api-key"), XpayUtils.apiKey)
+        reset()
     }
 
 
@@ -87,12 +96,14 @@ class XpayUtilsTest {
             PaymentMethods.CASH,
             PaymentMethods.KIOSK
         )
+        XpayUtils.activePaymentMethods.clear()
         runBlocking {
             XpayUtils.prepareAmount(80)
         }
         // assertionmutableListOf
         assertFalse(XpayUtils.activePaymentMethods.isEmpty());
         assertEquals(XpayUtils.activePaymentMethods, testPaymentMethods);
+        reset()
     }
 
     // check that prepare amount set total prepared amount successfull
@@ -104,13 +115,15 @@ class XpayUtilsTest {
         XpayUtils.request = serviceRequest
         val prepareAmountResponseBody = FileUtils.readTestResourceFile("PrepareAmountResponse.json")
         mockWebServer.enqueue(MockResponse().setBody(prepareAmountResponseBody))
-        val testPaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(card=5002.0, cash=5000.0, kiosk=5285.0)
+        val testPaymentOptionsTotalAmounts =
+            PaymentOptionsTotalAmounts(card = 5002.0, cash = 5000.0, kiosk = 5285.0)
         runBlocking {
             XpayUtils.prepareAmount(80)
         }
         // assertion
         assertNotNull(XpayUtils.PaymentOptionsTotalAmounts)
         assertEquals(XpayUtils.PaymentOptionsTotalAmounts, testPaymentOptionsTotalAmounts)
+        reset()
     }
 
     // check that prepare amount returns error to is failed (no network errors- server error)
@@ -127,6 +140,7 @@ class XpayUtilsTest {
         runBlocking {
             XpayUtils.prepareAmount(60)
         }
+        reset()
     }
 
     // pay method tests
@@ -149,6 +163,7 @@ class XpayUtilsTest {
         runBlocking {
             XpayUtils.pay()
         }
+        reset()
     }
 
     // pay returns error when payment method is not available in payment options
@@ -166,6 +181,7 @@ class XpayUtilsTest {
         runBlocking {
             XpayUtils.pay()
         }
+        reset()
     }
 
     // pay returns error when user informations is missing
@@ -183,6 +199,7 @@ class XpayUtilsTest {
         runBlocking {
             XpayUtils.pay()
         }
+        reset()
     }
 
     // pay sends correct payload
@@ -212,13 +229,14 @@ class XpayUtilsTest {
         var payResponseData: PayData? = null
 
         runBlocking {
-             payResponseData = XpayUtils.pay()
+            payResponseData = XpayUtils.pay()
         }
         // assertion
         assertEquals(payResponseData, payDataObject)
         val request: RecordedRequest = mockWebServer.takeRequest()
         assertEquals("/v1/payments/pay/variable-amount", request.path)
         assertEquals(request.getHeader("x-api-key"), XpayUtils.apiKey)
+        reset()
     }
 
     // pay passes pay to is successful on successful operation
@@ -258,6 +276,7 @@ class XpayUtilsTest {
         val request: RecordedRequest = mockWebServer.takeRequest()
         assertEquals("/v1/payments/pay/variable-amount", request.path)
         assertEquals(request.getHeader("x-api-key"), XpayUtils.apiKey)
+        reset()
     }
 
     //  pay returns error to is failed (no network errors- server error)
@@ -282,6 +301,7 @@ class XpayUtilsTest {
         runBlocking {
             XpayUtils.pay()
         }
+        reset()
     }
 
     // pay returns error to is failed (network error)
