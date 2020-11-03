@@ -1,0 +1,19 @@
+{
+  "status": {
+    "code": 400,
+    "message": "",
+    "errors": [
+      {
+        "apartment": [
+          "This field is required"
+        ]
+      }
+    ]
+  },
+  "data": {
+
+  },
+  "count": null,
+  "next": null,
+  "previous": null
+}

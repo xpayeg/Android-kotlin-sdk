@@ -5,11 +5,15 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class ServiceBuilder(serverSetting: ServerSetting = ServerSetting.TEST) {
+internal class ServiceBuilder(
+    serverSetting: ServerSetting = ServerSetting.TEST,
+    private val Test: Boolean = false
+) {
     private val client = OkHttpClient.Builder().build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://${if (serverSetting == ServerSetting.LIVE) "community" else "new-dev"}.xpay.app/api/")
+        .baseUrl(if (!Test) "https://${if (serverSetting == ServerSetting.LIVE) "community" else "new-dev"}.xpay.app/api/" else "http://127.0.0.1:8080")
+//        .baseUrl("http://127.0.0.1:8080")
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()
@@ -18,3 +22,4 @@ class ServiceBuilder(serverSetting: ServerSetting = ServerSetting.TEST) {
         return retrofit.create(service)
     }
 }
+
