@@ -16,11 +16,11 @@ interface Xpay {
     suspend fun prepareAmount(@Body category: PrepareRequestBody, @Header("x-api-key") authToken: String): Response<PrepareAmountResponse>
 
     @GET("v1/communities/{community_id}/transactions/{transaction_uuid}/")
-    fun getTransaction(
+    suspend fun getTransaction(
         @Header("x-api-key") authToken: String,
         @Path("community_id") id: String,
         @Path("transaction_uuid") m_id: String
-    ): Call<TransactionResponse>
+    ): Response<TransactionResponse>
 
     @POST("v1/payments/pay/variable-amount")
     suspend fun pay(@Header("x-api-key") authToken: String, @Body category: PayRequestBody): Response<PayResponse>

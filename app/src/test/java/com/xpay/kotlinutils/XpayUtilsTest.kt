@@ -9,6 +9,8 @@ import com.xpay.kotlinutils.models.api.pay.PayData
 import com.xpay.kotlinutils.models.api.pay.PayResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
+import com.xpay.kotlinutils.models.api.transaction.TransactionData
+import com.xpay.kotlinutils.models.api.transaction.TransactionResponse
 import junit.framework.Assert.*
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -410,6 +412,107 @@ class XpayUtilsTest {
         runBlocking {
             XpayUtils.pay()
         }
+    }
+
+    //transaction method tests
+
+    // throws error when no settings are found
+    @Test
+    fun getTransaction_noApiKey_throwsError() {
+        // set expected exception properties
+        exceptionRule.expect(IllegalArgumentException::class.java)
+        exceptionRule.expectMessage("API key is not set")
+
+        // set settings
+        setSettings()
+        XpayUtils.apiKey = null
+
+        runBlocking {
+            XpayUtils.getTransaction("")
+        }
+    }
+
+    @Test
+    fun getTransaction_noCommunityId_throwsError() {
+        // set expected exception properties
+        exceptionRule.expect(IllegalArgumentException::class.java)
+        exceptionRule.expectMessage("Community ID is not set")
+
+        // set settings
+        setSettings()
+        XpayUtils.communityId = null
+
+        // run method
+        runBlocking {
+            XpayUtils.getTransaction("")
+        }
+    }
+
+    @Test
+    fun getTransaction_noVariableAmountId_throwsError() {
+        // set expected exception properties
+        exceptionRule.expect(IllegalArgumentException::class.java)
+        exceptionRule.expectMessage("API Payment ID is not set")
+
+        // set settings
+        setSettings()
+        XpayUtils.variableAmountID = null
+
+        // run method
+        runBlocking {
+            XpayUtils.getTransaction("")
+        }
+    }
+
+    @Test
+    fun getTransaction_allSettings_makeRequestSuccessfully() {
+        // test settings
+        setSettings()
+
+        val getTransactionResponseBody =
+            FileUtils.readTestResourceFile("getTransactionResponse.json")
+
+        // Schedule some responses.
+        mockWebServer.enqueue(MockResponse().setBody(getTransactionResponseBody))
+
+        // run
+        runBlocking {
+            XpayUtils.getTransaction("562c6565-1cc9-4773-87d8-f2b1f3af3246")
+        }
+
+        // assertion
+        val request: RecordedRequest = mockWebServer.takeRequest()
+        assertEquals(
+            "/v1/communities/${XpayUtils.communityId}/transactions/562c6565-1cc9-4773-87d8-f2b1f3af3246/",
+            request.path
+        )
+        assertEquals(request.getHeader("x-api-key"), XpayUtils.apiKey)
+    }
+
+    @Test
+    fun getTransaction_allSettings_returnsDataSuccessfully() {
+        // test settings
+        setSettings()
+
+        val getTransactionResponseBody =
+            FileUtils.readTestResourceFile("getTransactionResponse.json")
+        val gson = Gson()
+        val responseType = object : TypeToken<TransactionResponse>() {}.type
+        val responseMock: TransactionResponse =
+            gson.fromJson(getTransactionResponseBody, responseType)
+        val prepareDataObject: TransactionData = responseMock.data
+        var prepareData: TransactionData? = null
+
+        // Schedule some responses.
+        mockWebServer.enqueue(MockResponse().setBody(getTransactionResponseBody))
+
+        // run
+        runBlocking {
+            prepareData = XpayUtils.getTransaction("562c6565-1cc9-4773-87d8-f2b1f3af3246")
+        }
+
+        // assertion
+        assertEquals(prepareData, prepareDataObject)
     }
 
     @After
