@@ -13,6 +13,7 @@ import com.xpay.kotlinutils.models.api.pay.PayResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareRequestBody
+import com.xpay.kotlinutils.models.api.transaction.TransactionData
 import com.xpay.kotlinutils.models.api.transaction.TransactionResponse
 import okhttp3.ResponseBody
 import okio.IOException
@@ -141,7 +142,6 @@ object XpayUtils {
         bodyPay.billing_data = billingData
 
         // custom fields
-//        val customBody: List<CustomField>
         if (customFields.size > 0) {
             bodyPay.custom_fields = customFields
         }
@@ -170,31 +170,30 @@ object XpayUtils {
 
     // Transaction info related methods
 
-    fun getTransaction(
-        token: String,
-        communityID: String,
-        transactionUid: String,
-        onSuccess: (TransactionResponse) -> Unit,
-        onFail: (String) -> Unit
-    ) {
-//        val request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
-        val call = request.getTransaction(token, communityID, transactionUid)
-        call.enqueue(object : Callback<TransactionResponse> {
-            override fun onResponse(
-                call: Call<TransactionResponse>,
-                response: Response<TransactionResponse>
-            ) {
-                if (response.body() != null && response.isSuccessful && response.code() != 404) {
-                    onSuccess(response.body()!!)
-                } else {
-                    response.body()?.status?.errors?.get(0)?.let { onFail(it.toString()) }
-                }
-            }
+    suspend fun getTransaction(
+        transactionUid: String
+    ): TransactionData? {
+        checkAPISettings()
+        var transactionData: TransactionData? = null
 
-            override fun onFailure(call: Call<TransactionResponse>, t: Throwable) {
-                onFail(t.message.toString())
+        val res = apiKey?.let {
+            this.communityId?.let { it1 ->
+                request.getTransaction(
+                    it,
+                    it1, transactionUid
+                )
             }
-        })
+        }
+        if (res?.body() != null && res.isSuccessful) {
+            transactionData = res.body()!!.data
+        } else {
+            val gson = Gson()
+            val type = object : TypeToken<TransactionResponse>() {}.type
+            val errorResponse: TransactionResponse? =
+                gson.fromJson(res?.errorBody()?.charStream(), type)
+            errorResponse?.status?.errors?.get(0)?.let { throwError(it.toString()) }
+        }
+        return transactionData
     }
 
     // Private Methods
