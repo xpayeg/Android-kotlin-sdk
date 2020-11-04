@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cb16be67-3bf5-404d-b20e-a7fc9213f01e" name="Default Changelist" comment="add server setting option so the user is able to choose between test and live">
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view />
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Enum" />
+        <option value="JUnit4 Test Class" />
+        <option value="Kotlin Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="develop" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1iSgA8YqY2cBc9UB9oTsWVNZmIz" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/test/java/com/xpay/kotlinutils" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/assets" />
+    <property name="project.structure.last.edited" value="Dependencies" />
+    <property name="project.structure.proportion" value="0.17" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="com.xpay.kotlinutils" />
+    </key>
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="com.xpay.kotlinutils.models.api.prepare" />
+      <recent name="com.xpay.kotlinutils.models.api.transaction" />
+      <recent name="com.xpay.kotlinutils.models.api" />
+      <recent name="com.xpay.kotlinutils.model.api" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Rostom\Documents\GitHub\Android-kotlin-sdk\app\src\assets" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Rostom\Documents\GitHub\Android-kotlin-sdk\app\src\test" />
+      <recent name="C:\Users\Rostom\Documents\GitHub\Android-kotlin-sdk\app\src\main\java\com\xpay\kotlinutils\models\api\pay" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="XpayUtilsTest.pay_payUsingNotDefined_throwsError" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.xpay.kotlinutils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.xpay.kotlinutils" />
+      <option name="MAIN_CLASS_NAME" value="com.xpay.kotlinutils.XpayUtilsTest" />
+      <option name="METHOD_NAME" value="pay_payUsingNotDefined_throwsError" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="XpayUtilsTest.pay_paymentMethodNotAvailable_throwsError" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.xpay.kotlinutils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.xpay.kotlinutils" />
+      <option name="MAIN_CLASS_NAME" value="com.xpay.kotlinutils.XpayUtilsTest" />
+      <option name="METHOD_NAME" value="pay_paymentMethodNotAvailable_throwsError" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="XpayUtilsTest.pay_userInfoNotSet_throwError" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.xpay.kotlinutils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.xpay.kotlinutils" />
+      <option name="MAIN_CLASS_NAME" value="com.xpay.kotlinutils.XpayUtilsTest" />
+      <option name="METHOD_NAME" value="pay_userInfoNotSet_throwError" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="XpayUtilsTest.prepareAmount_allSettings_passDataSuccessfully" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.xpay.kotlinutils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.xpay.kotlinutils" />
+      <option name="MAIN_CLASS_NAME" value="com.xpay.kotlinutils.XpayUtilsTest" />
+      <option name="METHOD_NAME" value="prepareAmount_allSettings_passDataSuccessfully" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="XpayUtilsTest.prepareAmount_noSettings_throwserror" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="app" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.xpay.kotlinutils.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.xpay.kotlinutils" />
+      <option name="MAIN_CLASS_NAME" value="com.xpay.kotlinutils.XpayUtilsTest" />
+      <option name="METHOD_NAME" value="prepareAmount_noSettings_throwserror" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cb16be67-3bf5-404d-b20e-a7fc9213f01e" name="Default Changelist" comment="" />
+      <created>1601906261712</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1601906261712</updated>
+    </task>
+    <task id="LOCAL-00001" summary="refactor get transaction info method">
+      <created>1601938190695</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1601938190695</updated>
+    </task>
+    <task id="LOCAL-00002" summary="refactor models structure">
+      <created>1601940040551</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1601940040551</updated>
+    </task>
+    <task id="LOCAL-00003" summary="refactor models">
+      <created>1602064754700</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1602064754700</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fix sending pay using value with pay method">
+      <created>1602076233855</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1602076233855</updated>
+    </task>
+    <task id="LOCAL-00005" summary="remove unnecessary endpoints interfaces">
+      <created>1602080710447</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1602080710447</updated>
+    </task>
+    <task id="LOCAL-00006" summary="fix pay using issue">
+      <created>1602084776222</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1602084776222</updated>
+    </task>
+    <task id="LOCAL-00007" summary="add server setting option so the user is able to choose between test and live">
+      <created>1602089209609</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1602089209609</updated>
+    </task>
+    <task id="LOCAL-00008" summary="mock server response">
+      <created>1603104394000</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1603104394002</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="refactor get transaction info method" />
+    <MESSAGE value="refactor models structure" />
+    <MESSAGE value="refactor models" />
+    <MESSAGE value="fix sending pay using value with pay method" />
+    <MESSAGE value="remove unnecessary endpoints interfaces" />
+    <MESSAGE value="fix pay using issue" />
+    <MESSAGE value="add server setting option so the user is able to choose between test and live" />
+    <MESSAGE value="mock server response" />
+    <option name="LAST_COMMIT_MESSAGE" value="mock server response" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="151" y="104" key="#PSD" timestamp="1602674400368">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="151" y="104" key="#PSD/62.0.1304.768@62.0.1304.768" timestamp="1602674400368" />
+    <state x="154" y="92" width="1120" height="584" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog" timestamp="1603195926606">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="154" y="92" width="1120" height="584" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/62.0.1304.768@62.0.1304.768" timestamp="1603195926606" />
+    <state x="432" y="187" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1602675675226">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="432" y="187" key="#com.intellij.fileTypes.FileTypeChooser/62.0.1304.768@62.0.1304.768" timestamp="1602675675226" />
+    <state x="394" y="120" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1602062393311">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="394" y="120" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/62.0.1304.768@62.0.1304.768" timestamp="1602062393311" />
+    <state x="297" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1601939068030">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="297" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/62.0.1304.768@62.0.1304.768" timestamp="1601939068030" />
+    <state x="444" y="131" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1601938804158">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="444" y="131" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/62.0.1304.768@62.0.1304.768" timestamp="1601938804158" />
+    <state x="493" y="48" width="602" height="672" key="#org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.ui.MoveKotlinTopLevelDeclarationsDialog" timestamp="1601939860018">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="493" y="48" width="602" height="672" key="#org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.ui.MoveKotlinTopLevelDeclarationsDialog/62.0.1304.768@62.0.1304.768" timestamp="1601939860018" />
+    <state x="294" y="139" key="AndroidCreateResourceDirectoryDialog" timestamp="1603113927664">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="294" y="139" key="AndroidCreateResourceDirectoryDialog/62.0.1304.768@62.0.1304.768" timestamp="1603113927664" />
+    <state x="62" y="0" key="CommitChangelistDialog2" timestamp="1603104390561">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="62" y="0" key="CommitChangelistDialog2/62.0.1304.768@62.0.1304.768" timestamp="1603104390561" />
+    <state x="172" y="120" width="1084" height="528" key="DiffContextDialog" timestamp="1602079433075">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="172" y="120" width="1084" height="528" key="DiffContextDialog/62.0.1304.768@62.0.1304.768" timestamp="1602079433075" />
+    <state x="494" y="138" key="FileChooserDialogImpl" timestamp="1603028600463">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="494" y="138" key="FileChooserDialogImpl/62.0.1304.768@62.0.1304.768" timestamp="1603028600463" />
+    <state width="1261" height="133" key="GridCell.Tab.0.bottom" timestamp="1603792309907">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="1261" height="133" key="GridCell.Tab.0.bottom/62.0.1304.768@62.0.1304.768" timestamp="1603792309907" />
+    <state width="1261" height="133" key="GridCell.Tab.0.center" timestamp="1603792309907">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="1261" height="133" key="GridCell.Tab.0.center/62.0.1304.768@62.0.1304.768" timestamp="1603792309907" />
+    <state width="1261" height="133" key="GridCell.Tab.0.left" timestamp="1603792309906">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="1261" height="133" key="GridCell.Tab.0.left/62.0.1304.768@62.0.1304.768" timestamp="1603792309906" />
+    <state width="1261" height="133" key="GridCell.Tab.0.right" timestamp="1603792309907">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="1261" height="133" key="GridCell.Tab.0.right/62.0.1304.768@62.0.1304.768" timestamp="1603792309907" />
+    <state width="1261" height="238" key="GridCell.Tab.1.bottom" timestamp="1603038308198">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="1261" height="238" key="GridCell.Tab.1.bottom/62.0.1304.768@62.0.1304.768" timestamp="1603038308198" />
+    <state width="1261" height="238" key="GridCell.Tab.1.center" timestamp="1603038308198">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="1261" height="238" key="GridCell.Tab.1.center/62.0.1304.768@62.0.1304.768" timestamp="1603038308198" />
+    <state width="1261" height="238" key="GridCell.Tab.1.left" timestamp="1603038308198">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="1261" height="238" key="GridCell.Tab.1.left/62.0.1304.768@62.0.1304.768" timestamp="1603038308198" />
+    <state width="1261" height="238" key="GridCell.Tab.1.right" timestamp="1603038308198">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="1261" height="238" key="GridCell.Tab.1.right/62.0.1304.768@62.0.1304.768" timestamp="1603038308198" />
+    <state x="294" y="127" key="IDE.errors.dialog" timestamp="1602081468441">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="294" y="127" key="IDE.errors.dialog/62.0.1304.768@62.0.1304.768" timestamp="1602081468441" />
+    <state x="184" y="59" key="MergeDialog" timestamp="1602085487328">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="184" y="59" key="MergeDialog/62.0.1304.768@62.0.1304.768" timestamp="1602085487328" />
+    <state x="426" y="100" key="MultipleFileMergeDialog" timestamp="1602085487336">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="426" y="100" key="MultipleFileMergeDialog/62.0.1304.768@62.0.1304.768" timestamp="1602085487336" />
+    <state x="456" y="95" key="RollbackChangesDialog" timestamp="1602079628718">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="456" y="95" key="RollbackChangesDialog/62.0.1304.768@62.0.1304.768" timestamp="1602079628718" />
+    <state x="348" y="18" key="SettingsEditor" timestamp="1602085119162">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="348" y="18" key="SettingsEditor/62.0.1304.768@62.0.1304.768" timestamp="1602085119162" />
+    <state width="498" height="446" key="SwitcherDM" timestamp="1602079683965">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state width="498" height="446" key="SwitcherDM/62.0.1304.768@62.0.1304.768" timestamp="1602079683965" />
+    <state x="405" y="142" key="Vcs.Multiple.Commit.Info.Dialog.Key" timestamp="1602085467879">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="405" y="142" key="Vcs.Multiple.Commit.Info.Dialog.Key/62.0.1304.768@62.0.1304.768" timestamp="1602085467879" />
+    <state x="306" y="117" key="Vcs.Push.Dialog.v2" timestamp="1602089157990">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="306" y="117" key="Vcs.Push.Dialog.v2/62.0.1304.768@62.0.1304.768" timestamp="1602089157990" />
+    <state x="530" y="162" key="chooseDestDirectoryDialog" timestamp="1602530572829">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="530" y="162" key="chooseDestDirectoryDialog/62.0.1304.768@62.0.1304.768" timestamp="1602530572829" />
+    <state x="154" y="92" width="1120" height="584" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1602079284341">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="154" y="92" width="1120" height="584" key="com.intellij.history.integration.ui.views.FileHistoryDialog/62.0.1304.768@62.0.1304.768" timestamp="1602079284341" />
+    <state x="409" y="207" key="com.intellij.ide.util.TipDialog" timestamp="1604318711462">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="409" y="207" key="com.intellij.ide.util.TipDialog/62.0.1304.768@62.0.1304.768" timestamp="1604318711462" />
+    <state x="523" y="301" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1601932788648">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="523" y="301" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/62.0.1304.768@62.0.1304.768" timestamp="1601932788648" />
+    <state x="477" y="97" key="git4idea.branch.GitSmartOperationDialog" timestamp="1602079129859">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="477" y="97" key="git4idea.branch.GitSmartOperationDialog/62.0.1304.768@62.0.1304.768" timestamp="1602079129859" />
+    <state x="478" y="87" key="org.jetbrains.kotlin.idea.testIntegration.KotlinCreateTestDialog" timestamp="1602530572867">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="478" y="87" key="org.jetbrains.kotlin.idea.testIntegration.KotlinCreateTestDialog/62.0.1304.768@62.0.1304.768" timestamp="1602530572867" />
+    <state x="255" y="115" key="psd.add.library.dependency.panel.dimension" timestamp="1602674395963">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="255" y="115" key="psd.add.library.dependency.panel.dimension/62.0.1304.768@62.0.1304.768" timestamp="1602674395963" />
+    <state x="370" y="172" key="run.anything.popup" timestamp="1603624625632">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="370" y="172" key="run.anything.popup/62.0.1304.768@62.0.1304.768" timestamp="1603624625632" />
+    <state x="370" y="36" width="670" height="676" key="search.everywhere.popup" timestamp="1602079687816">
+      <screen x="62" y="0" width="1304" height="768" />
+    </state>
+    <state x="370" y="36" width="670" height="676" key="search.everywhere.popup/62.0.1304.768@62.0.1304.768" timestamp="1602079687816" />
+  </component>
+</project>

@@ -2,26 +2,27 @@ package com.xpay.kotlinutils
 
 import android.content.Context
 import android.widget.Toast
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.xpay.kotlinutils.api.ServiceBuilder
 import com.xpay.kotlinutils.api.Xpay
 import com.xpay.kotlinutils.models.*
 import com.xpay.kotlinutils.models.api.pay.PayData
 import com.xpay.kotlinutils.models.api.pay.PayRequestBody
 import com.xpay.kotlinutils.models.api.pay.PayResponse
+import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
 import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareRequestBody
-import com.xpay.kotlinutils.models.api.prepare.PrepareAmountData
 import com.xpay.kotlinutils.models.api.transaction.TransactionResponse
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
+import okhttp3.ResponseBody
+import okio.IOException
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.Converter
 import retrofit2.Response
-import java.lang.Exception
 import java.util.*
 import kotlin.collections.HashMap
+
 
 object XpayUtils {
 
@@ -36,21 +37,22 @@ object XpayUtils {
         }
 
     // Payment methods data
-    internal var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
+    var PaymentOptionsTotalAmounts: PaymentOptionsTotalAmounts? = null
+        internal set
 
-    //        private set
     var payUsing: PaymentMethods? = null
 
     // Pay request body
-    internal var activePaymentMethods = mutableListOf<PaymentMethods>()
-//        private set
+    var activePaymentMethods = mutableListOf<PaymentMethods>()
+        internal set
+
     private val currency: String? = "EGP"
     var customFields = mutableListOf<CustomField>()
-        private set
+//        private set
 
     // User data
     var userInfo: User? = null
-    var shippingShippingInfo: ShippingInfo? = null
+    var ShippingInfo: ShippingInfo? = null
 
     // private settings
     internal var request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
@@ -76,11 +78,15 @@ object XpayUtils {
             preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
             PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
                 preparedData.total_amount,
-                preparedData.CASH.total_amount,
-                preparedData.KIOSK.total_amount
+                preparedData.CASH?.total_amount,
+                preparedData.KIOSK?.total_amount
             )
         } else {
-            res?.body()?.status?.errors?.get(0)?.let { throwError(it) }
+            val gson = Gson()
+            val type = object : TypeToken<PrepareAmountResponse>() {}.type
+            val errorResponse: PrepareAmountResponse? =
+                gson.fromJson(res?.errorBody()?.charStream(), type)
+            errorResponse?.status?.errors?.get(0)?.let { throwError(it.toString()) }
         }
         return preparedData
     }
@@ -121,7 +127,7 @@ object XpayUtils {
         currency?.let { bodyPay.currency = it }
 
         if (payUsing == PaymentMethods.CASH) {
-            shippingShippingInfo?.let {
+            ShippingInfo?.let {
                 billingData["country"] = "EG"
                 billingData["apartment"] = it.apartment
                 billingData["city"] = it.city
@@ -143,7 +149,11 @@ object XpayUtils {
         if (res?.body() != null && res.isSuccessful) {
             preparedData = res.body()!!.data
         } else {
-            res!!.body()?.status?.errors?.get(0)?.let { throwError(it) }
+            val gson = Gson()
+            val type = object : TypeToken<PayResponse>() {}.type
+            val errorResponse: PayResponse? =
+                gson.fromJson(res?.errorBody()?.charStream(), type)
+            errorResponse?.status?.errors?.get(0)?.let { throwError(it.toString()) }
         }
         return preparedData
     }
@@ -177,7 +187,7 @@ object XpayUtils {
                 if (response.body() != null && response.isSuccessful && response.code() != 404) {
                     onSuccess(response.body()!!)
                 } else {
-                    response.body()?.status?.errors?.get(0)?.let { onFail(it) }
+                    response.body()?.status?.errors?.get(0)?.let { onFail(it.toString()) }
                 }
             }
 
@@ -198,4 +208,5 @@ object XpayUtils {
         communityId ?: throwError("Community ID is not set")
         variableAmountID ?: throwError("API Payment ID is not set")
     }
+
 }
