@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Unit tests
-        run: ./gradlew testDebugUnitTest
+        run:  ./gradlew testDebugUnitTest
       - name: Checkout current repository in ubuntu's file system 
         uses: actions/checkout@v1
       - name: Setup JDK 1.8
