@@ -1,4 +1,4 @@
-package com.xpay.kotlinutils.model
+package com.xpay.kotlinutils.models
 
 data class User(val name: String, val email: String, val phone: String) {
     init {

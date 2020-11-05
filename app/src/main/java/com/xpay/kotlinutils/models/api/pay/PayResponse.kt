@@ -1,8 +1,7 @@
-package com.xpay.kotlinutils.model
+package com.xpay.kotlinutils.models.api.pay
 
 import com.google.gson.annotations.SerializedName
-import com.xpay.kotlin.models.PayData
-import com.xpay.kotlin.models.Status
+import com.xpay.kotlinutils.models.api.Status
 
 data class PayResponse (
 

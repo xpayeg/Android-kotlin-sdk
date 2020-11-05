@@ -1,13 +1,12 @@
-package com.xpay.kotlinutils.model
+package com.xpay.kotlinutils.models.api.prepare
 
 import com.google.gson.annotations.SerializedName
-import com.xpay.kotlin.models.PrepareData
-import com.xpay.kotlin.models.Status
+import com.xpay.kotlinutils.models.api.Status
 
 
-data class PrepareAmount (
+data class PrepareAmountResponse (
     @SerializedName("status") val status : Status,
-    @SerializedName("data") val data : PrepareData,
+    @SerializedName("data") val data : PrepareAmountData,
     @SerializedName("count") val count : String,
     @SerializedName("next") val next : String,
     @SerializedName("previous") val previous : String
