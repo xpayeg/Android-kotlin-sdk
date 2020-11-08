@@ -6,10 +6,9 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ sdk-ci-cd ]
+    branches: [ master ]
   pull_request:
-    branches: [ develop ]
-
+    branches: [ master ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -17,8 +16,7 @@ jobs:
     name: Build and run tests
     runs-on: ubuntu-latest
     steps:
-      - name: Unit tests
-        run: ./gradlew testDebugUnitTest
+      
       - name: Checkout current repository in ubuntu's file system 
         uses: actions/checkout@v1
       - name: Setup JDK 1.8
@@ -27,6 +25,9 @@ jobs:
           java-version: 1.8
       - name: Print contents in current directory
         run: ls -la
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest
+
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
