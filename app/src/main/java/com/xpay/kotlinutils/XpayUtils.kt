@@ -75,8 +75,8 @@ object XpayUtils {
         if (res?.body() != null && res.isSuccessful) {
             preparedData = res.body()!!.data
             preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
-            preparedData.CASH.let { activePaymentMethods.add(PaymentMethods.CASH) }
-            preparedData.KIOSK.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
+            preparedData.CASH?.let { activePaymentMethods.add(PaymentMethods.CASH) }
+            preparedData.KIOSK?.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
             PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
                 preparedData.total_amount,
                 preparedData.CASH?.total_amount,
