@@ -19,4 +19,5 @@ jobs:
       - name: Build the app
         run: ./gradlew build
       - name: list directories
-        run: ls -la
+        run: cd app/build/outputs/
+      - run: ls -la
