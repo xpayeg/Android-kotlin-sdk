@@ -18,4 +18,4 @@ jobs:
       - name: Checkout current repository in ubuntu's file system
         uses: actions/checkout@v1
       - name: Unit tests
-        run: ./gradlew testUnitTest
+        run: ./gradlew testReleaseUnitTest
