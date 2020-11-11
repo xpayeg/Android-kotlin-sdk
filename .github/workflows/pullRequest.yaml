@@ -1,12 +1,14 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Build and test
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
   pull_request:
-    branches: [ develop ]
+    branches:
+      - develop
+      - master
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -14,10 +16,7 @@ jobs:
     name: Build and run tests
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout current repository in ubuntu's file system
         uses: actions/checkout@v2
-      - name: Build the app
-        run: ./gradlew build
       - name: Run unit tests
         run: ./gradlew testReleaseUnitTest
