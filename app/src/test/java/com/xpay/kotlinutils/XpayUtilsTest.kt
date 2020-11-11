@@ -64,8 +64,8 @@ class XpayUtilsTest {
     @Test
     fun prepareAmount_noApiKey_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("API key is not ")
+        exceptionRule.expect(NullPointerException::class.java)
+        exceptionRule.expectMessage("API key is not set")
 
         // set settings
         setSettings()
