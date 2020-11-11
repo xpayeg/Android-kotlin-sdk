@@ -18,5 +18,5 @@ jobs:
     steps:
       - name: Checkout current repository in ubuntu's file system
         uses: actions/checkout@v2
-      - name: Run unit tests
+      - name: Build and run unit tests
         run: ./gradlew build
