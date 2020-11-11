@@ -67,7 +67,7 @@ object XpayUtils {
 
     suspend fun prepareAmount(
         amount: Number
-    ): PrepareAmountData? {
+    ): PrepareAmountData? 
         checkAPISettings()
         var preparedData: PrepareAmountData? = null
         val body = PrepareRequestBody(communityId.toString(), amount)
