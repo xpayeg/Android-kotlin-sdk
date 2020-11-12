@@ -20,7 +20,3 @@ jobs:
         uses: actions/checkout@v2
       - name: Build and run unit tests
         run: ./gradlew build
-      - name: print output files
-        run: |
-          cd app/build/outputs/aar
-          ls
