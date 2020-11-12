@@ -21,5 +21,6 @@ jobs:
       - name: Build and run unit tests
         run: ./gradlew build
       - name: print output files
-        run: cd app/build/outputs
-             ls
+        run: |
+          cd app/build/outputs
+          ls
