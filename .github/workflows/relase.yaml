@@ -29,6 +29,8 @@ jobs:
             Testing release workflow
           draft: false
           prerelease: false
+      - name: print directory contents
+        uses: ls -la
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
