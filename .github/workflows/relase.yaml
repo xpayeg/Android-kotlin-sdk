@@ -5,7 +5,7 @@ name: Release workflow
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
-  create:
+  push:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
