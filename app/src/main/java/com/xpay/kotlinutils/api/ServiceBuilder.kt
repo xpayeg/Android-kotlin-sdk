@@ -12,7 +12,7 @@ internal class ServiceBuilder(
     private val client = OkHttpClient.Builder().build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(if (!Test) "https://${if (serverSetting == ServerSetting.LIVE) "community" else "staging"}.xpay.app/api/" else "http://127.0.0.1:8080")
+        .baseUrl(if (!Test) "https://${if (serverSetting == ServerSetting.LIVE) "community" else "new-dev"}.xpay.app/api/" else "http://127.0.0.1:8080")
 //        .baseUrl("http://127.0.0.1:8080")
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
