@@ -74,7 +74,7 @@ object XpayUtils {
         val res = apiKey?.let { request.prepareAmount(body, it) }
         if (res?.body() != null && res.isSuccessful) {
             preparedData = res.body()!!.data
-            preparedData.total_amount.let { activePaymentMethods.add(PaymentMethods.CARD) }
+            preparedData.total_amount?.let { activePaymentMethods.add(PaymentMethods.CARD) }
             preparedData.CASH?.let { activePaymentMethods.add(PaymentMethods.CASH) }
             preparedData.KIOSK?.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
             PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
