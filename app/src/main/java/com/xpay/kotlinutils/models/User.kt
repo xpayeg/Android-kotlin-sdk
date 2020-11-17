@@ -6,7 +6,7 @@ data class User(val name: String, val email: String, val phone: String) {
         val nameMatchResult = namePattern.matches(name)
         if (!nameMatchResult)
             throw IllegalArgumentException("must provide a full name in the correct format")
-        val emailPattern = Regex("^[a-z0-9._%+-]+@[a-z.-]+[.][a-z]{2,4}\$")
+        val emailPattern = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z.-]+[.][a-zA-Z]{2,4}\$")
         val emailMatchResult = emailPattern.matches(email)
         if (!emailMatchResult)
             throw IllegalArgumentException("must provide an email in the correct format")
