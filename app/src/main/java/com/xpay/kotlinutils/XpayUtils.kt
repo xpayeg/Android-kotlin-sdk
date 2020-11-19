@@ -121,7 +121,6 @@ object XpayUtils {
                 billingData["apartment"] = it.apartment
                 billingData["city"] = it.city
                 billingData["state"] = it.state
-                billingData["country"] = it.country
                 billingData["floor"] = it.floor
                 billingData["street"] = it.street
                 billingData["building"] = it.building
