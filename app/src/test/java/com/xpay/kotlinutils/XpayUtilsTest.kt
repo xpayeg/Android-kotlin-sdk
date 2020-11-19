@@ -21,6 +21,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
+import java.lang.IllegalStateException
 
 
 class XpayUtilsTest {
@@ -64,8 +65,8 @@ class XpayUtilsTest {
     @Test
     fun prepareAmount_noApiKey_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("API key is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("apiKey is required")
 
         // set settings
         setSettings()
@@ -79,8 +80,8 @@ class XpayUtilsTest {
     @Test
     fun prepareAmount_noCommunityId_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("Community ID is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("communityId is required")
 
         // set settings
         setSettings()
@@ -95,8 +96,8 @@ class XpayUtilsTest {
     @Test
     fun prepareAmount_noVariableAmountId_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("API Payment ID is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("variableAmountID is required")
 
         // set settings
         setSettings()
@@ -228,8 +229,8 @@ class XpayUtilsTest {
     @Test
     fun pay_noApiKey_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("API key is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("apiKey is required")
 
         // set settings
         setSettings()
@@ -243,8 +244,8 @@ class XpayUtilsTest {
     @Test
     fun pay_noCommunityId_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("Community ID is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("communityId is required")
 
         // set settings
         setSettings()
@@ -259,8 +260,8 @@ class XpayUtilsTest {
     @Test
     fun pay_noVariableAmountId_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("API Payment ID is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("variableAmountID is required")
 
         // set settings
         setSettings()
@@ -272,14 +273,52 @@ class XpayUtilsTest {
         }
     }
 
+    // pay throws error when called without calling prepareAmount
+    @Test
+    fun pay_PaymentOptionsTotalAmountsIsNull_throwsError() {
+        // set expected exception properties
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("PaymentOptionsTotalAmounts is not set")
+
+        setSettings()
+        XpayUtils.activePaymentMethods =
+            mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
+        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
+        XpayUtils.payUsing = PaymentMethods.CARD
+
+        runBlocking {
+            XpayUtils.pay()
+        }
+    }
+
+    @Test
+    fun pay_activePaymentMethodsIsEmpty_throwsError() {
+        // set expected exception properties
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("activePaymentMethods is empty")
+
+        setSettings()
+        XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
+        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
+        XpayUtils.payUsing = PaymentMethods.CARD
+
+        runBlocking {
+            XpayUtils.pay()
+        }
+    }
+
     // pay returns error when called without setting pay using
     @Test
     fun pay_payUsingNotDefined_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
+        exceptionRule.expect(IllegalStateException::class.java)
         exceptionRule.expectMessage("Payment method is not set")
 
         setSettings()
+        XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
+        XpayUtils.activePaymentMethods =
+            mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
+        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
 
         runBlocking {
             XpayUtils.pay()
@@ -291,12 +330,14 @@ class XpayUtilsTest {
     fun pay_paymentMethodNotAvailable_throwsError() {
         // set expected exception properties
         exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("Payment method is not available")
+        exceptionRule.expectMessage("Payment method chosen is not available")
 
         setSettings()
+        XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(null, null, 52.85)
         XpayUtils.activePaymentMethods =
-            mutableListOf(PaymentMethods.CASH, PaymentMethods.KIOSK)
+            mutableListOf(PaymentMethods.KIOSK)
         XpayUtils.payUsing = PaymentMethods.CARD
+        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
 
         runBlocking {
             XpayUtils.pay()
@@ -308,14 +349,34 @@ class XpayUtilsTest {
     fun pay_userInfoNotFound_throwsError() {
 
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("User information is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("Billing information is not found")
 
         setSettings()
         XpayUtils.activePaymentMethods =
             mutableListOf(PaymentMethods.CASH, PaymentMethods.KIOSK)
         XpayUtils.payUsing = PaymentMethods.KIOSK
         XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
+
+        runBlocking {
+            XpayUtils.pay()
+        }
+    }
+
+    // pay throws error when shipping information is missing
+    @Test
+    fun pay_shippingInfoNotFound_throwsError() {
+
+        // set expected exception properties
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("Shipping Information is not found")
+
+        setSettings()
+        XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
+        XpayUtils.activePaymentMethods =
+            mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
+        XpayUtils.payUsing = PaymentMethods.CASH
+        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
 
         runBlocking {
             XpayUtils.pay()
@@ -420,8 +481,8 @@ class XpayUtilsTest {
     @Test
     fun getTransaction_noApiKey_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("API key is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("apiKey is required")
 
         // set settings
         setSettings()
@@ -435,8 +496,8 @@ class XpayUtilsTest {
     @Test
     fun getTransaction_noCommunityId_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("Community ID is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("communityId is required")
 
         // set settings
         setSettings()
@@ -451,8 +512,8 @@ class XpayUtilsTest {
     @Test
     fun getTransaction_noVariableAmountId_throwsError() {
         // set expected exception properties
-        exceptionRule.expect(IllegalArgumentException::class.java)
-        exceptionRule.expectMessage("API Payment ID is not set")
+        exceptionRule.expect(IllegalStateException::class.java)
+        exceptionRule.expectMessage("variableAmountID is required")
 
         // set settings
         setSettings()
