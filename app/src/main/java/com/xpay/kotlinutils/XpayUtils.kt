@@ -22,7 +22,7 @@ object XpayUtils {
     // API required settings
     var apiKey: String? = null
     var communityId: String? = null
-    var variableAmountID: Number? = null
+    var apiPaymentId: Number? = null
     var serverSetting: ServerSetting = ServerSetting.TEST
         set(value) {
             field = value
@@ -42,7 +42,7 @@ object XpayUtils {
     var customFields = mutableListOf<CustomField>()
 
     // User data
-    var userInfo: User? = null
+    var billingInfo: BillingInfo? = null
     var ShippingInfo: ShippingInfo? = null
 
     // private/internal settings
@@ -84,12 +84,12 @@ object XpayUtils {
         checkNotNull(PaymentOptionsTotalAmounts) { "PaymentOptionsTotalAmounts is not set" }
         check(activePaymentMethods.isNotEmpty()) { "activePaymentMethods is empty" }
         checkNotNull(payUsing) { "Payment method is not set" }
-        checkNotNull(userInfo) { "Billing information is not found" }
+        checkNotNull(billingInfo) { "Billing information is not found" }
 
         var preparedData: PayData? = null
         val bodyPay = PayRequestBody()
 
-        variableAmountID?.let { bodyPay.variable_amount_id = it }
+        apiPaymentId?.let { bodyPay.variable_amount_id = it }
         communityId?.let { bodyPay.community_id = it }
 
         // Payment method
@@ -107,11 +107,11 @@ object XpayUtils {
         }
 
         // Billing information
-        val user: User = userInfo!!
+        val billingInfo: BillingInfo = billingInfo!!
         val billingData: HashMap<String, Any> = HashMap()
-        billingData["name"] = user.name
-        billingData["email"] = user.email
-        billingData["phone_number"] = user.phone
+        billingData["name"] = billingInfo.name
+        billingData["email"] = billingInfo.email
+        billingData["phone_number"] = billingInfo.phone
 
         currency?.let { bodyPay.currency = it }
 
@@ -135,6 +135,9 @@ object XpayUtils {
         val res = apiKey?.let { request.pay(it, bodyPay) }
         if (res?.body() != null && res.isSuccessful) {
             preparedData = res.body()!!.data
+            clearCustomFields()
+            PaymentOptionsTotalAmounts = null
+            activePaymentMethods.clear()
         } else {
             val gson = Gson()
             val type = object : TypeToken<PayResponse>() {}.type
@@ -151,7 +154,7 @@ object XpayUtils {
         customFields.add(CustomField(fieldName, fieldValue))
     }
 
-    fun clearCustomField() {
+    fun clearCustomFields() {
         customFields.clear()
     }
 
@@ -192,7 +195,7 @@ object XpayUtils {
     private fun checkAPISettings() {
         checkNotNull(apiKey) { "apiKey is required" }
         checkNotNull(communityId) { "communityId is required" }
-        checkNotNull(variableAmountID) { "variableAmountID is required" }
+        checkNotNull(apiPaymentId) { "variableAmountID is required" }
     }
 
 }

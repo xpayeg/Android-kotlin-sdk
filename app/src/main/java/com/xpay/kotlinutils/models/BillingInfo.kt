@@ -1,6 +1,6 @@
 package com.xpay.kotlinutils.models
 
-data class User(val name: String, val email: String, val phone: String) {
+data class BillingInfo(val name: String, val email: String, val phone: String) {
     init {
         val namePattern = Regex("^[a-zA-Z\\u0621-\\u064A-]{3,}(?:\\s[a-zA-Z\\u0621-\\u064A-]{3,})+\$")
         val nameMatchResult = namePattern.matches(name)
