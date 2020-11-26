@@ -135,6 +135,7 @@ object XpayUtils {
         val res = apiKey?.let { request.pay(it, bodyPay) }
         if (res?.body() != null && res.isSuccessful) {
             preparedData = res.body()!!.data
+            clearCustomField()
         } else {
             val gson = Gson()
             val type = object : TypeToken<PayResponse>() {}.type
