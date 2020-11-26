@@ -135,7 +135,8 @@ object XpayUtils {
         val res = apiKey?.let { request.pay(it, bodyPay) }
         if (res?.body() != null && res.isSuccessful) {
             preparedData = res.body()!!.data
-            clearCustomField()
+            clearCustomFields()
+            PaymentOptionsTotalAmounts = null
         } else {
             val gson = Gson()
             val type = object : TypeToken<PayResponse>() {}.type
@@ -152,7 +153,7 @@ object XpayUtils {
         customFields.add(CustomField(fieldName, fieldValue))
     }
 
-    fun clearCustomField() {
+    fun clearCustomFields() {
         customFields.clear()
     }
 
