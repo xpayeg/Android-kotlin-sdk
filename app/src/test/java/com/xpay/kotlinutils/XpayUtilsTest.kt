@@ -43,7 +43,7 @@ class XpayUtilsTest {
 
         XpayUtils.PaymentOptionsTotalAmounts = null
         XpayUtils.payUsing = null
-        XpayUtils.userInfo = null
+        XpayUtils.billingInfo = null
         XpayUtils.ShippingInfo = null
     }
 
@@ -283,7 +283,7 @@ class XpayUtilsTest {
         setSettings()
         XpayUtils.activePaymentMethods =
             mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
-        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
+        XpayUtils.billingInfo = BillingInfo("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
         XpayUtils.payUsing = PaymentMethods.CARD
 
         runBlocking {
@@ -299,7 +299,7 @@ class XpayUtilsTest {
 
         setSettings()
         XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
-        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
+        XpayUtils.billingInfo = BillingInfo("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
         XpayUtils.payUsing = PaymentMethods.CARD
 
         runBlocking {
@@ -318,7 +318,7 @@ class XpayUtilsTest {
         XpayUtils.PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(52.0, 50.0, 52.85)
         XpayUtils.activePaymentMethods =
             mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
-        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
+        XpayUtils.billingInfo = BillingInfo("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
 
         runBlocking {
             XpayUtils.pay()
@@ -337,7 +337,7 @@ class XpayUtilsTest {
         XpayUtils.activePaymentMethods =
             mutableListOf(PaymentMethods.KIOSK)
         XpayUtils.payUsing = PaymentMethods.CARD
-        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
+        XpayUtils.billingInfo = BillingInfo("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
 
         runBlocking {
             XpayUtils.pay()
@@ -376,7 +376,7 @@ class XpayUtilsTest {
         XpayUtils.activePaymentMethods =
             mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
         XpayUtils.payUsing = PaymentMethods.CASH
-        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
+        XpayUtils.billingInfo = BillingInfo("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
 
         runBlocking {
             XpayUtils.pay()
@@ -392,7 +392,7 @@ class XpayUtilsTest {
         XpayUtils.activePaymentMethods =
             mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
         XpayUtils.payUsing = PaymentMethods.CARD
-        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
+        XpayUtils.billingInfo = BillingInfo("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201111111111")
 
         val payResponseBody = FileUtils.readTestResourceFile("PayResponse.json")
         mockWebServer.enqueue(MockResponse().setBody(payResponseBody))
@@ -420,7 +420,7 @@ class XpayUtilsTest {
         XpayUtils.activePaymentMethods =
             mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
         XpayUtils.payUsing = PaymentMethods.CARD
-        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
+        XpayUtils.billingInfo = BillingInfo("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
 
         val payResponseBody = FileUtils.readTestResourceFile("PayResponse.json")
         mockWebServer.enqueue(MockResponse().setBody(payResponseBody))
@@ -459,7 +459,7 @@ class XpayUtilsTest {
             mutableListOf(PaymentMethods.CARD, PaymentMethods.CASH, PaymentMethods.KIOSK)
 
         XpayUtils.payUsing = PaymentMethods.CASH
-        XpayUtils.userInfo = User("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
+        XpayUtils.billingInfo = BillingInfo("Mahmoud Aziz", "mabdelaziz@xpay.app", "+201226476026")
         XpayUtils.ShippingInfo = ShippingInfo("egypt", "", "", "", "", "", "")
         XpayUtils.request = serviceRequest
         // Schedule some responses.

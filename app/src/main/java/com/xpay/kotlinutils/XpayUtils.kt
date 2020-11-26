@@ -42,7 +42,7 @@ object XpayUtils {
     var customFields = mutableListOf<CustomField>()
 
     // User data
-    var userInfo: User? = null
+    var billingInfo: BillingInfo? = null
     var ShippingInfo: ShippingInfo? = null
 
     // private/internal settings
@@ -84,7 +84,7 @@ object XpayUtils {
         checkNotNull(PaymentOptionsTotalAmounts) { "PaymentOptionsTotalAmounts is not set" }
         check(activePaymentMethods.isNotEmpty()) { "activePaymentMethods is empty" }
         checkNotNull(payUsing) { "Payment method is not set" }
-        checkNotNull(userInfo) { "Billing information is not found" }
+        checkNotNull(billingInfo) { "Billing information is not found" }
 
         var preparedData: PayData? = null
         val bodyPay = PayRequestBody()
@@ -107,11 +107,11 @@ object XpayUtils {
         }
 
         // Billing information
-        val user: User = userInfo!!
+        val billingInfo: BillingInfo = billingInfo!!
         val billingData: HashMap<String, Any> = HashMap()
-        billingData["name"] = user.name
-        billingData["email"] = user.email
-        billingData["phone_number"] = user.phone
+        billingData["name"] = billingInfo.name
+        billingData["email"] = billingInfo.email
+        billingData["phone_number"] = billingInfo.phone
 
         currency?.let { bodyPay.currency = it }
 
