@@ -137,6 +137,7 @@ object XpayUtils {
             preparedData = res.body()!!.data
             clearCustomFields()
             PaymentOptionsTotalAmounts = null
+            activePaymentMethods.clear()
         } else {
             val gson = Gson()
             val type = object : TypeToken<PayResponse>() {}.type
