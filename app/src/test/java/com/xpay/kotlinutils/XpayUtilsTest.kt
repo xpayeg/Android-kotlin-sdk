@@ -38,7 +38,7 @@ class XpayUtilsTest {
     fun reset() {
         XpayUtils.apiKey = null
         XpayUtils.communityId = null
-        XpayUtils.variableAmountID = null
+        XpayUtils.apiPaymentId = null
         XpayUtils.activePaymentMethods.clear()
 
         XpayUtils.PaymentOptionsTotalAmounts = null
@@ -50,7 +50,7 @@ class XpayUtilsTest {
     fun setSettings() {
         XpayUtils.apiKey = "3uBD5mrj.3HSCm46V7xJ5yfIkPb2gBOIUFH4Ks0Ss"
         XpayUtils.communityId = "zogDmQW"
-        XpayUtils.variableAmountID = 18
+        XpayUtils.apiPaymentId = 18
         XpayUtils.request = serviceRequest
     }
 
@@ -101,7 +101,7 @@ class XpayUtilsTest {
 
         // set settings
         setSettings()
-        XpayUtils.variableAmountID = null
+        XpayUtils.apiPaymentId = null
 
         // run method
         runBlocking {
@@ -265,7 +265,7 @@ class XpayUtilsTest {
 
         // set settings
         setSettings()
-        XpayUtils.variableAmountID = null
+        XpayUtils.apiPaymentId = null
 
         // run method
         runBlocking {
@@ -517,7 +517,7 @@ class XpayUtilsTest {
 
         // set settings
         setSettings()
-        XpayUtils.variableAmountID = null
+        XpayUtils.apiPaymentId = null
 
         // run method
         runBlocking {

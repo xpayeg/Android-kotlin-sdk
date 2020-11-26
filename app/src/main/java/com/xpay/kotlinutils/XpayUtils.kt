@@ -22,7 +22,7 @@ object XpayUtils {
     // API required settings
     var apiKey: String? = null
     var communityId: String? = null
-    var variableAmountID: Number? = null
+    var apiPaymentId: Number? = null
     var serverSetting: ServerSetting = ServerSetting.TEST
         set(value) {
             field = value
@@ -89,7 +89,7 @@ object XpayUtils {
         var preparedData: PayData? = null
         val bodyPay = PayRequestBody()
 
-        variableAmountID?.let { bodyPay.variable_amount_id = it }
+        apiPaymentId?.let { bodyPay.variable_amount_id = it }
         communityId?.let { bodyPay.community_id = it }
 
         // Payment method
@@ -193,7 +193,7 @@ object XpayUtils {
     private fun checkAPISettings() {
         checkNotNull(apiKey) { "apiKey is required" }
         checkNotNull(communityId) { "communityId is required" }
-        checkNotNull(variableAmountID) { "variableAmountID is required" }
+        checkNotNull(apiPaymentId) { "variableAmountID is required" }
     }
 
 }
