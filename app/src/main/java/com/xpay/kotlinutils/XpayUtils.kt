@@ -1,7 +1,5 @@
 package com.xpay.kotlinutils
 
-import android.content.Context
-import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.xpay.kotlinutils.api.ServiceBuilder
@@ -15,12 +13,6 @@ import com.xpay.kotlinutils.models.api.prepare.PrepareAmountResponse
 import com.xpay.kotlinutils.models.api.prepare.PrepareRequestBody
 import com.xpay.kotlinutils.models.api.transaction.TransactionData
 import com.xpay.kotlinutils.models.api.transaction.TransactionResponse
-import okhttp3.ResponseBody
-import okio.IOException
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Converter
-import retrofit2.Response
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -47,21 +39,15 @@ object XpayUtils {
     var activePaymentMethods = mutableListOf<PaymentMethods>()
         internal set
 
-    private val currency: String? = "EGP"
     var customFields = mutableListOf<CustomField>()
-//        private set
 
     // User data
     var userInfo: User? = null
     var ShippingInfo: ShippingInfo? = null
 
-    // private settings
+    // private/internal settings
     internal var request = ServiceBuilder(serverSetting).xpayService(Xpay::class.java)
-
-
-    fun welcomeMessage(context: Context) {
-        Toast.makeText(context, "Welcome To XPay Sdk", Toast.LENGTH_LONG).show()
-    }
+    private val currency: String? = "EGP"
 
     // Payments related methods
 
@@ -95,6 +81,11 @@ object XpayUtils {
     suspend fun pay(): PayData? {
         // check for API settings
         checkAPISettings()
+        checkNotNull(PaymentOptionsTotalAmounts) { "PaymentOptionsTotalAmounts is not set" }
+        check(activePaymentMethods.isNotEmpty()) { "activePaymentMethods is empty" }
+        checkNotNull(payUsing) { "Payment method is not set" }
+        checkNotNull(userInfo) { "Billing information is not found" }
+
         var preparedData: PayData? = null
         val bodyPay = PayRequestBody()
 
@@ -111,20 +102,17 @@ object XpayUtils {
                     PaymentMethods.KIOSK -> bodyPay.amount = PaymentOptionsTotalAmounts?.kiosk!!
                 }
             } else {
-                throwError("Payment method is not available")
+                throwError("Payment method chosen is not available")
             }
-
-        } ?: throwError("Payment method is not set")
+        }
 
         // Billing information
-        val user: User = userInfo ?: throwError("User information is not set")
+        val user: User = userInfo!!
         val billingData: HashMap<String, Any> = HashMap()
         billingData["name"] = user.name
         billingData["email"] = user.email
         billingData["phone_number"] = user.phone
 
-        PaymentOptionsTotalAmounts
-            ?: throwError("Total amount is not set, call prepareAmount method")
         currency?.let { bodyPay.currency = it }
 
         if (payUsing == PaymentMethods.CASH) {
@@ -133,11 +121,10 @@ object XpayUtils {
                 billingData["apartment"] = it.apartment
                 billingData["city"] = it.city
                 billingData["state"] = it.state
-                billingData["country"] = it.country
                 billingData["floor"] = it.floor
                 billingData["street"] = it.street
                 billingData["building"] = it.building
-            }
+            } ?: throw IllegalStateException("Shipping Information is not found")
         }
         bodyPay.billing_data = billingData
 
@@ -174,7 +161,7 @@ object XpayUtils {
         transactionUid: String
     ): TransactionData? {
         checkAPISettings()
-        var transactionData: TransactionData? = null
+        var response: TransactionData? = null
 
         val res = apiKey?.let {
             this.communityId?.let { it1 ->
@@ -185,7 +172,7 @@ object XpayUtils {
             }
         }
         if (res?.body() != null && res.isSuccessful) {
-            transactionData = res.body()!!.data
+            response = res.body()!!.data
         } else {
             val gson = Gson()
             val type = object : TypeToken<TransactionResponse>() {}.type
@@ -193,7 +180,7 @@ object XpayUtils {
                 gson.fromJson(res?.errorBody()?.charStream(), type)
             errorResponse?.status?.errors?.get(0)?.let { throwError(it.toString()) }
         }
-        return transactionData
+        return response
     }
 
     // Private Methods
@@ -203,9 +190,9 @@ object XpayUtils {
     }
 
     private fun checkAPISettings() {
-        apiKey ?: throwError("API key is not set")
-        communityId ?: throwError("Community ID is not set")
-        variableAmountID ?: throwError("API Payment ID is not set")
+        checkNotNull(apiKey) { "apiKey is required" }
+        checkNotNull(communityId) { "communityId is required" }
+        checkNotNull(variableAmountID) { "variableAmountID is required" }
     }
 
 }
