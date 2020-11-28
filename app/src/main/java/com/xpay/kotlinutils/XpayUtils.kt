@@ -161,7 +161,7 @@ object XpayUtils {
     // Transaction info related methods
 
     suspend fun getTransaction(
-        transactionUid: String
+        transactionUuid: String
     ): TransactionData? {
         checkAPISettings()
         var response: TransactionData? = null
@@ -170,7 +170,7 @@ object XpayUtils {
             this.communityId?.let { it1 ->
                 request.getTransaction(
                     it,
-                    it1, transactionUid
+                    it1, transactionUuid
                 )
             }
         }
