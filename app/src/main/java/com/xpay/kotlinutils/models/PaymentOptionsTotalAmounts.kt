@@ -1,4 +1,4 @@
-package com.xpay.kotlinutils.model
+package com.xpay.kotlinutils.models
 
 data class PaymentOptionsTotalAmounts(
     val card: Number? = null,

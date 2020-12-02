@@ -1,9 +1,9 @@
-package com.xpay.kotlin.models
+package com.xpay.kotlinutils.models.api.transaction
 
 import com.google.gson.annotations.SerializedName
-import java.util.*
+import com.xpay.kotlinutils.models.api.Status
 
-data class Transaction (
+data class TransactionResponse (
 
     @SerializedName("status") val status : Status,
     @SerializedName("data") val data : TransactionData,

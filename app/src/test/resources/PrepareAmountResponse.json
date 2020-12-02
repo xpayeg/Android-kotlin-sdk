@@ -1,0 +1,22 @@
+{
+  "status": {
+    "code": 200,
+    "message": "success",
+    "errors": []
+  },
+  "data": {
+    "total_amount": 5002.0,
+    "total_amount_currency": "EGP",
+    "CASH": {
+      "total_amount": 5000.0,
+      "total_amount_currency": "EGP"
+    },
+    "KIOSK": {
+      "total_amount": 5285.0,
+      "total_amount_currency": "EGP"
+    }
+  },
+  "count": null,
+  "next": null,
+  "previous": null
+}
