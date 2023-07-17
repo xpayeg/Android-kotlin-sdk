@@ -4,7 +4,7 @@ enum class PaymentMethods {
     CARD,
     CASH,
     KIOSK,
+    MEEZA,
     FAWRY,
-    MEEZA/DIGITAL,
     VALU
 }

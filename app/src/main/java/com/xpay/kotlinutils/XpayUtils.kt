@@ -60,13 +60,22 @@ object XpayUtils {
         val res = apiKey?.let { request.prepareAmount(body, it) }
         if (res?.body() != null && res.isSuccessful) {
             preparedData = res.body()!!.data
-            preparedData.total_amount?.let { activePaymentMethods.add(PaymentMethods.CARD) }
-            preparedData.CASH?.let { activePaymentMethods.add(PaymentMethods.CASH) }
-            preparedData.KIOSK?.let { activePaymentMethods.add(PaymentMethods.KIOSK) }
+            preparedData.total_amount?.let { 
+                activePaymentMethods.add(PaymentMethods.CARD) 
+                activePaymentMethods.add(PaymentMethods.CASH)
+                activePaymentMethods.add(PaymentMethods.KIOSK)
+                activePaymentMethods.add(PaymentMethods.MEEZA)
+                activePaymentMethods.add(PaymentMethods.FAWRY)
+                activePaymentMethods.add(PaymentMethods.VALU)
+            }
+
             PaymentOptionsTotalAmounts = PaymentOptionsTotalAmounts(
                 preparedData.total_amount,
-                preparedData.CASH?.total_amount,
-                preparedData.KIOSK?.total_amount
+                preparedData.total_amount,
+                preparedData.total_amount,
+                preparedData.total_amount,
+                preparedData.total_amount,
+                preparedData.total_amount
             )
         } else {
             val gson = Gson()
@@ -95,11 +104,18 @@ object XpayUtils {
         // Payment method
         payUsing?.let {
             if (it in activePaymentMethods) {
-                bodyPay.pay_using = it.toString().toLowerCase(Locale.ROOT)
+                if(it.toString() == "MEEZA") {
+                    bodyPay.pay_using = "meeza/digital"
+                } else {
+                    bodyPay.pay_using = it.toString().toLowerCase(Locale.ROOT)
+                }
                 when (it) {
                     PaymentMethods.CARD -> bodyPay.amount = PaymentOptionsTotalAmounts?.card!!
                     PaymentMethods.CASH -> bodyPay.amount = PaymentOptionsTotalAmounts?.cash!!
                     PaymentMethods.KIOSK -> bodyPay.amount = PaymentOptionsTotalAmounts?.kiosk!!
+                    PaymentMethods.MEEZA -> bodyPay.amount = PaymentOptionsTotalAmounts?.meeza!!
+                    PaymentMethods.FAWRY -> bodyPay.amount = PaymentOptionsTotalAmounts?.fawry!!
+                    PaymentMethods.VALU -> bodyPay.amount = PaymentOptionsTotalAmounts?.valu!!
                 }
             } else {
                 throwError("Payment method chosen is not available")
